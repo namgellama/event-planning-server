@@ -15,6 +15,12 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     sendResponse(res, tokens, "User logged in successfully");
 });
 
+export const logoutUser = asyncHandler(async (_req: Request, res: Response) => {
+    await authService.logout(res);
+
+    sendResponse(res, null, "User logged out successfully");
+});
+
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
     const user = await authService.getMe(req.user.id);
 

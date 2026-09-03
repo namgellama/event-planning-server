@@ -53,6 +53,10 @@ export async function login(
     return { accessToken, refreshToken };
 }
 
+export async function logout(res: Response) {
+    res.clearCookie("refreshToken");
+}
+
 export async function getMe(userId: string): Promise<Omit<User, "password">> {
     const user = await userRepository.findById(userId);
 
