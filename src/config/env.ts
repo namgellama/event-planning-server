@@ -11,6 +11,11 @@ const envSchema = z.object({
         .default("info"),
     FRONTEND_URL: z.string(),
     DATABASE_URL: z.string(),
+    POSTGRES_USER: z.string(),
+    POSTGRES_PASSWORD: z.string(),
+    POSTGRES_DB: z.string(),
+    POSTGRES_HOST: z.string(),
+    POSTGRES_PORT: z.coerce.number().int(),
 });
 
 const parsed = envSchema.safeParse(process.env);

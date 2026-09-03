@@ -4,7 +4,11 @@ import { Pool } from "pg";
 import { logger } from "../config/logger.js";
 
 const pool = new Pool({
-    connectionString: env.DATABASE_URL,
+    database: env.POSTGRES_DB,
+    user: env.POSTGRES_USER,
+    password: env.POSTGRES_PASSWORD,
+    host: env.POSTGRES_HOST,
+    port: env.POSTGRES_PORT,
 });
 
 pool.on("connect", () => {
@@ -23,7 +27,13 @@ pool.on("error", (error) => {
 
 export const db = knex({
     client: "pg",
-    connectionPool: pool,
+    connection: {
+        user: env.POSTGRES_USER,
+        password: env.POSTGRES_PASSWORD,
+        database: env.POSTGRES_DB,
+        host: env.POSTGRES_HOST,
+        port: env.POSTGRES_PORT,
+    },
 });
 
 export async function checkDB() {
