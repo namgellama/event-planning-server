@@ -1,13 +1,24 @@
 import app from "./app.js";
-import dotenv from "dotenv";
+import { env } from "./config/env.js";
+import { logger } from "./config/logger.js";
+import { checkDB } from "./db/index.js";
 
-dotenv.config();
+const PORT = env.PORT;
+const ENVIRONMENT = env.NODE_ENV;
 
-const PORT = process.env.PORT;
-const ENVIRONMENT = process.env.NODE_ENV;
+const start = async () => {
+    try {
+        await checkDB();
 
-app.listen(PORT, () => {
-    console.log(
-        `Server listening in ${ENVIRONMENT} environment on Port ${PORT}`,
-    );
-});
+        app.listen(PORT);
+        logger.info({ port: PORT, environment: ENVIRONMENT }, "Server started");
+    } catch (error) {
+        logger.fatal(
+            { error: error instanceof Error ? error.message : error },
+            "Application startup failed",
+        );
+        process.exit(1);
+    }
+};
+
+start();
