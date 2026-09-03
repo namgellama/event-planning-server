@@ -1,0 +1,30 @@
+/// <reference types="node" />
+
+import "dotenv/config";
+import type { Knex } from "knex";
+
+// Update with your config settings.
+
+const config: { [key: string]: Knex.Config } = {
+    development: {
+        client: "postgresql",
+        connection: {
+            database: process.env.POSTGRES_DB!,
+            user: process.env.POSTGRES_USER,
+            password: process.env.POSTGRES_PASSWORD,
+            host: process.env.POSTGRES_HOST,
+            port: Number(process.env.POSTGRES_PORT),
+        },
+        pool: {
+            min: 2,
+            max: 10,
+        },
+        migrations: {
+            tableName: "knex_migrations",
+            directory: "./migrations",
+            extension: "ts",
+        },
+    },
+};
+
+module.exports = config;

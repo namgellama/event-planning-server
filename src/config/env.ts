@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import type ms from "ms";
 import { z } from "zod";
 
 dotenv.config();
@@ -11,6 +12,15 @@ const envSchema = z.object({
         .default("info"),
     FRONTEND_URL: z.string(),
     DATABASE_URL: z.string(),
+    POSTGRES_USER: z.string(),
+    POSTGRES_PASSWORD: z.string(),
+    POSTGRES_DB: z.string(),
+    POSTGRES_HOST: z.string(),
+    POSTGRES_PORT: z.coerce.number().int(),
+    JWT_ACCESS_SECRET: z.string(),
+    JWT_ACCESS_EXPIRY: z.custom<ms.StringValue>(),
+    JWT_REFRESH_SECRET: z.string(),
+    JWT_REFRESH_EXPIRY: z.custom<ms.StringValue>(),
 });
 
 const parsed = envSchema.safeParse(process.env);
