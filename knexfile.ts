@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import "dotenv/config";
 import type { Knex } from "knex";
 
@@ -7,7 +9,7 @@ const config: { [key: string]: Knex.Config } = {
     development: {
         client: "postgresql",
         connection: {
-            database: process.env.POSTGRES_DB,
+            database: process.env.POSTGRES_DB!,
             user: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             host: process.env.POSTGRES_HOST,

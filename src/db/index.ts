@@ -1,6 +1,6 @@
 import knex from "knex";
-import { env } from "../config/env.js";
 import { Pool } from "pg";
+import { env } from "../config/env.js";
 import { logger } from "../config/logger.js";
 
 const pool = new Pool({

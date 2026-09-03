@@ -3,6 +3,7 @@ import express, { type Request, type Response } from "express";
 import { env } from "./config/env.js";
 import { errorHandler } from "./errors/error-handler.js";
 import { notFound } from "./errors/not-found.js";
+import authRoutes from "./routes/auth.route.js";
 import helmet from "helmet";
 
 const app = express();
@@ -16,6 +17,8 @@ app.get("/health", (_req: Request, res: Response) => {
         status: "ok",
     });
 });
+
+app.use("/api/v1/auth", authRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
