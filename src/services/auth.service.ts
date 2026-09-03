@@ -52,3 +52,15 @@ export async function login(
 
     return { accessToken, refreshToken };
 }
+
+export async function getMe(userId: string): Promise<Omit<User, "password">> {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
+    const { password, ...rest } = user;
+
+    return rest;
+}

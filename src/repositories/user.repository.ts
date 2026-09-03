@@ -2,6 +2,20 @@ import { db } from "../db/index.js";
 import type { User } from "../types/user.js";
 import type { RegisterUserInput } from "../validations/auth.validation.js";
 
+export async function findById(id: string): Promise<User | undefined> {
+    return await db<User>("users")
+        .select(
+            "id",
+            "name",
+            "email",
+            "password",
+            "created_at as createdAt",
+            "updated_at as updatedAt",
+        )
+        .where("id", id)
+        .first();
+}
+
 export async function findByEmail(email: string): Promise<User | undefined> {
     return await db<User>("users").select("*").where("email", email).first();
 }

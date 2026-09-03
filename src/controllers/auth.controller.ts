@@ -14,3 +14,9 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
     sendResponse(res, tokens, "User logged in successfully");
 });
+
+export const getMe = asyncHandler(async (req: Request, res: Response) => {
+    const user = await authService.getMe(req.user.id);
+
+    sendResponse(res, user, "Current user fetched successfully");
+});
