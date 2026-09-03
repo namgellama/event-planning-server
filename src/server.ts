@@ -1,11 +1,9 @@
 import app from "./app.js";
-import dotenv from "dotenv";
+import { env } from "./config/env.js";
 import { logger } from "./config/logger.js";
 
-dotenv.config();
-
-const PORT = process.env.PORT;
-const ENVIRONMENT = process.env.NODE_ENV;
+const PORT = env.PORT;
+const ENVIRONMENT = env.NODE_ENV;
 
 const start = async () => {
     try {
