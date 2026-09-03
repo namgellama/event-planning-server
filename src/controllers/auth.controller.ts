@@ -21,6 +21,12 @@ export const logoutUser = asyncHandler(async (_req: Request, res: Response) => {
     sendResponse(res, null, "User logged out successfully");
 });
 
+export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
+    const accessToken = await authService.refreshToken(req);
+
+    sendResponse(res, accessToken, "Token refreshed successfully");
+});
+
 export const getMe = asyncHandler(async (req: Request, res: Response) => {
     const user = await authService.getMe(req.user.id);
 

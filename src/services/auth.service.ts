@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import ms from "ms";
 import { env } from "../config/env.js";
 import { AppError } from "../errors/app-error.js";
 import * as userRepository from "../repositories/user.repository.js";
 import type { User } from "../types/user.js";
-import { signToken } from "../utils/jwt.js";
+import { signToken, verifyToken } from "../utils/jwt.js";
 import type { LoginUserInput, RegisterUserInput } from "../validations/auth.validation.js";
 
 export async function register(body: RegisterUserInput): Promise<Omit<User, "password">> {
@@ -39,7 +39,7 @@ export async function login(
     const accessToken = signToken({ sub: user.id }, env.JWT_ACCESS_SECRET, env.JWT_ACCESS_EXPIRY);
     const refreshToken = signToken(
         { sub: user.id },
-        env.JWT_REFRESH_EXPIRY,
+        env.JWT_REFRESH_SECRET,
         env.JWT_REFRESH_EXPIRY,
     );
 
@@ -53,8 +53,27 @@ export async function login(
     return { accessToken, refreshToken };
 }
 
-export async function logout(res: Response) {
+export async function logout(res: Response): Promise<void> {
     res.clearCookie("refreshToken");
+}
+
+export async function refreshToken(req: Request): Promise<string> {
+    const refreshToken = req.cookies?.refreshToken;
+    console.log("🚀 ~ refreshToken ~ refreshToken:", refreshToken);
+
+    if (!refreshToken) {
+        throw new AppError(401, "No refresh token found");
+    }
+
+    const payload = verifyToken(refreshToken, env.JWT_REFRESH_SECRET);
+
+    const user = await userRepository.findById(payload.sub);
+
+    if (!user) {
+        throw new AppError(401, "User not found");
+    }
+
+    return signToken({ sub: user.id }, env.JWT_ACCESS_SECRET, env.JWT_ACCESS_EXPIRY);
 }
 
 export async function getMe(userId: string): Promise<Omit<User, "password">> {
