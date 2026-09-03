@@ -7,3 +7,10 @@ export const registerUserSchema = z.object({
 });
 
 export type RegisterUserInput = z.infer<typeof registerUserSchema>;
+
+export const loginUserSchema = z.object({
+    email: z.email().trim(),
+    password: z.string().nonempty("Password is required"),
+});
+
+export type LoginUserInput = z.infer<typeof loginUserSchema>;
