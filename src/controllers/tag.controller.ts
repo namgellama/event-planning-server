@@ -26,3 +26,9 @@ export const updateTag = asyncHandler(async (req: Request<{ id: string }>, res: 
 
     sendResponse(res, tag, "Tag updated successfully");
 });
+
+export const deleteTag = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    await tagService.remove(req.params.id, req.user.id);
+
+    sendResponse(res, null, "Tag deleted successfully", 204);
+});

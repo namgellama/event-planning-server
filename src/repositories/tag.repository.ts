@@ -38,3 +38,7 @@ export async function update(
 
     return tag;
 }
+
+export async function remove(tagId: string, userId: string): Promise<number> {
+    return await db<Tag>("tags").where({ id: tagId, userId }).delete();
+}

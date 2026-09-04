@@ -29,3 +29,11 @@ export async function update(tagId: string, body: CreateTagInput, userId: string
     }
     return tag;
 }
+
+export async function remove(tagId: string, userId: string): Promise<void> {
+    const tag = await tagRepository.remove(tagId, userId);
+
+    if (tag === 0) {
+        throw new AppError(404, "Tag not found");
+    }
+}

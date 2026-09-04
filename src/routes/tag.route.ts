@@ -10,5 +10,6 @@ router.get("/", protect, tagController.getAllTags);
 router.get("/:id", protect, tagController.getTag);
 router.post("/", protect, validateBody(createTagSchema), tagController.createTag);
 router.patch("/:id", protect, validateBody(updateTagSchema), tagController.updateTag);
+router.delete("/:id", protect, tagController.deleteTag);
 
 export default router;
