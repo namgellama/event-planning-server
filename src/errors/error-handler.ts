@@ -22,6 +22,6 @@ export async function errorHandler(
         });
     }
 
-    logger.fatal(error);
+    logger.error(error);
     return res.status(500).json({ success: false, message: "Internal server error" });
 }

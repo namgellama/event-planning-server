@@ -6,6 +6,7 @@ import { createEventSchema } from "../validations/event.validation.js";
 
 const router = Router();
 
+router.get("/", protect, eventController.getAllEvents);
 router.post("/", protect, validateBody(createEventSchema), eventController.createEvent);
 
 export default router;
