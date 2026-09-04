@@ -29,7 +29,7 @@ export async function create(body: CreateEventInput, userId: string): Promise<Ev
         .insert({ ...body, userId })
         .returning("*");
 
-    return event as Event;
+    return event!;
 }
 
 export async function update(
