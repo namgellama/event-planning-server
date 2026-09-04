@@ -7,6 +7,7 @@
         "dev": "tsx watch ./src/server.ts",
         "db:migrate": "tsx ./node_modules/knex/bin/cli.js migrate:latest",
         "db:migrate:make": "tsx ./node_modules/knex/bin/cli.js migrate:make",
+        "db:migrate:rollback": "tsx ./node_modules/knex/bin/cli.js migrate:rollback",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
     },
