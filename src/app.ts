@@ -1,11 +1,12 @@
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Request, type Response } from "express";
+import helmet from "helmet";
 import { env } from "./config/env.js";
 import { errorHandler } from "./errors/error-handler.js";
 import { notFound } from "./errors/not-found.js";
 import authRoutes from "./routes/auth.route.js";
-import helmet from "helmet";
-import cookieParser from "cookie-parser";
+import eventRoutes from "./routes/event.route.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get("/health", (_req: Request, res: Response) => {
 });
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/events", eventRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

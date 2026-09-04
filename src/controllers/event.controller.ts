@@ -1,0 +1,10 @@
+import type { Request, Response } from "express";
+import { asyncHandler } from "../middlewares/async-handler.middleware.js";
+import * as eventService from "../services/event.service.js";
+import { sendResponse } from "../utils/response.js";
+
+export const createEvent = asyncHandler(async (req: Request, res: Response) => {
+    const event = await eventService.create(req.body, req.user.id);
+
+    sendResponse(res, event, "Event created successfully", 201);
+});
