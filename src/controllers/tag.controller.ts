@@ -20,3 +20,9 @@ export const createTag = asyncHandler(async (req: Request, res: Response) => {
 
     sendResponse(res, tag, "Tag created successfully", 201);
 });
+
+export const updateTag = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const tag = await tagService.update(req.params.id, req.body, req.user.id);
+
+    sendResponse(res, tag, "Tag updated successfully");
+});

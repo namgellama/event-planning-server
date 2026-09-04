@@ -1,6 +1,6 @@
 import { db } from "../db/index.js";
 import type { Tag } from "../types/tag.js";
-import type { CreateTagInput } from "../validations/tag.validation.js";
+import type { CreateTagInput, UpdateTagInput } from "../validations/tag.validation.js";
 
 export async function findAll(userId: string): Promise<Tag[]> {
     return await db<Tag>("tags").select("*").where("userId", userId);
@@ -20,4 +20,21 @@ export async function create(body: CreateTagInput, userId: string): Promise<Tag>
         .returning("*");
 
     return tag!;
+}
+
+export async function update(
+    tagId: string,
+    body: UpdateTagInput,
+    userId: string,
+): Promise<Tag | undefined> {
+    const updateData = Object.fromEntries(
+        Object.entries(body).filter(([, value]) => value != undefined),
+    );
+
+    const [tag] = await db<Tag>("tags")
+        .where({ id: tagId, userId })
+        .update({ ...updateData, updatedAt: new Date() })
+        .returning("*");
+
+    return tag;
 }

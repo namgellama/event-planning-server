@@ -5,3 +5,7 @@ export const createTagSchema = z.object({
 });
 
 export type CreateTagInput = z.infer<typeof createTagSchema>;
+
+export const updateTagSchema = createTagSchema.partial();
+
+export type UpdateTagInput = z.infer<typeof updateTagSchema>;
