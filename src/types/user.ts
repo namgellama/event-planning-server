@@ -1,8 +1,7 @@
-export type User = {
+import type { RegisterUserInput } from "../validations/auth.validation.js";
+
+export type User = RegisterUserInput & {
     id: string;
-    name: string;
-    email: string;
-    password: string;
     createdAt: string;
     updatedAt: string;
 };
