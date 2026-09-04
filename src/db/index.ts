@@ -1,4 +1,5 @@
 import knex from "knex";
+import knexStringcase from "knex-stringcase";
 import { Pool } from "pg";
 import { env } from "../config/env.js";
 import { logger } from "../config/logger.js";
@@ -34,6 +35,7 @@ export const db = knex({
         host: env.POSTGRES_HOST,
         port: env.POSTGRES_PORT,
     },
+    ...knexStringcase(),
 });
 
 export async function checkDB() {

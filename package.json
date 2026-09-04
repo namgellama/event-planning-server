@@ -7,6 +7,7 @@
         "dev": "tsx watch ./src/server.ts",
         "db:migrate": "tsx ./node_modules/knex/bin/cli.js migrate:latest",
         "db:migrate:make": "tsx ./node_modules/knex/bin/cli.js migrate:make",
+        "db:migrate:rollback": "tsx ./node_modules/knex/bin/cli.js migrate:rollback",
         "format": "prettier --write .",
         "format:check": "prettier --check ."
     },
@@ -23,6 +24,7 @@
         "helmet": "^8.3.0",
         "jsonwebtoken": "^9.0.3",
         "knex": "^3.3.0",
+        "knex-stringcase": "^1.6.0",
         "ms": "^2.1.3",
         "pg": "^8.23.0",
         "pino": "^10.3.1",

@@ -3,17 +3,7 @@ import type { User } from "../types/user.js";
 import type { RegisterUserInput } from "../validations/auth.validation.js";
 
 export async function findById(id: string): Promise<User | undefined> {
-    return await db<User>("users")
-        .select(
-            "id",
-            "name",
-            "email",
-            "password",
-            "created_at as createdAt",
-            "updated_at as updatedAt",
-        )
-        .where("id", id)
-        .first();
+    return await db<User>("users").select("*").where("id", id).first();
 }
 
 export async function findByEmail(email: string): Promise<User | undefined> {
@@ -21,9 +11,8 @@ export async function findByEmail(email: string): Promise<User | undefined> {
 }
 
 export async function create(body: RegisterUserInput): Promise<Omit<User, "password">> {
-    const [user] = await db<User>("users")
-        .insert(body)
-        .returning(["id", "name", "email", "created_at as createdAt", "updated_at as updatedAt"]);
+    const [user] = await db<User>("users").insert(body).returning("*");
+    const { password, ...rest } = user!;
 
-    return user as Omit<User, "password">;
+    return rest;
 }

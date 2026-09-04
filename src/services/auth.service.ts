@@ -59,7 +59,6 @@ export async function logout(res: Response): Promise<void> {
 
 export async function refreshToken(req: Request): Promise<string> {
     const refreshToken = req.cookies?.refreshToken;
-    console.log("🚀 ~ refreshToken ~ refreshToken:", refreshToken);
 
     if (!refreshToken) {
         throw new AppError(401, "No refresh token found");
