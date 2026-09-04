@@ -10,5 +10,6 @@ router.get("/", protect, eventController.getAllEvents);
 router.get("/:id", protect, eventController.getEvent);
 router.post("/", protect, validateBody(createEventSchema), eventController.createEvent);
 router.patch("/:id", protect, validateBody(updateEventSchema), eventController.updateEvent);
+router.delete("/:id", protect, eventController.deleteEvent);
 
 export default router;

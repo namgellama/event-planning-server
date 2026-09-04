@@ -26,3 +26,9 @@ export const updateEvent = asyncHandler(async (req: Request<{ id: string }>, res
 
     sendResponse(res, event, "Event updated successfully");
 });
+
+export const deleteEvent = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    await eventService.remove(req.params.id, req.user.id);
+
+    sendResponse(res, null, "Event deleted successfully", 204);
+});

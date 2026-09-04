@@ -48,3 +48,7 @@ export async function update(
 
     return event;
 }
+
+export async function remove(eventId: string, userId: string): Promise<number> {
+    return await db<Event>("events").where({ id: eventId, userId }).delete();
+}

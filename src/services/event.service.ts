@@ -34,3 +34,11 @@ export async function update(
 
     return event;
 }
+
+export async function remove(eventId: string, userId: string): Promise<void> {
+    const deleted = await eventRespository.remove(eventId, userId);
+
+    if (deleted === 0) {
+        throw new AppError(404, "Event not found");
+    }
+}
