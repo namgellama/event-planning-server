@@ -9,6 +9,12 @@ export const getAllEvents = asyncHandler(async (req: Request, res: Response) => 
     sendResponse(res, events, "All events fetched successfully");
 });
 
+export const getEvent = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const event = await eventService.getById(req.params.id, req.user.id);
+
+    sendResponse(res, event, "Event fetched successfully");
+});
+
 export const createEvent = asyncHandler(async (req: Request, res: Response) => {
     const event = await eventService.create(req.body, req.user.id);
 
