@@ -20,3 +20,9 @@ export const createEvent = asyncHandler(async (req: Request, res: Response) => {
 
     sendResponse(res, event, "Event created successfully", 201);
 });
+
+export const updateEvent = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const event = await eventService.update(req.params.id, req.body, req.user.id);
+
+    sendResponse(res, event, "Event updated successfully");
+});

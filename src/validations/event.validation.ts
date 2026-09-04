@@ -5,7 +5,7 @@ export const createEventSchema = z.object({
         .string()
         .min(3, "Title must be at least 3 characters")
         .max(100, "Title must not exceed 100 characters"),
-    description: z.string().nullable(),
+    description: z.string().nullable().optional(),
     date: z.iso.datetime({ offset: true }),
     location: z
         .string()
@@ -16,3 +16,7 @@ export const createEventSchema = z.object({
 });
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
+
+export const updateEventSchema = createEventSchema.partial();
+
+export type UpdateEventInput = z.infer<typeof updateEventSchema>;
