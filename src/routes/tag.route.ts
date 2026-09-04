@@ -7,6 +7,7 @@ import { createTagSchema } from "../validations/tag.validation.js";
 const router = Router();
 
 router.get("/", protect, tagController.getAllTags);
+router.get("/:id", protect, tagController.getTag);
 router.post("/", protect, validateBody(createTagSchema), tagController.createTag);
 
 export default router;

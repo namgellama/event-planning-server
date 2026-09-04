@@ -9,6 +9,12 @@ export const getAllTags = asyncHandler(async (req: Request, res: Response) => {
     sendResponse(res, tags, "All tags fetched successfully");
 });
 
+export const getTag = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const tag = await tagService.getById(req.params.id, req.user.id);
+
+    sendResponse(res, tag, "Tag fetched successfully");
+});
+
 export const createTag = asyncHandler(async (req: Request, res: Response) => {
     const tag = await tagService.create(req.body, req.user.id);
 

@@ -7,21 +7,18 @@ export async function findAll(userId: string): Promise<Event[]> {
 }
 
 export async function findById(eventId: string): Promise<Event | undefined> {
-    const [event] = await db<Event>("events").select("*").where("id", eventId);
-
-    return event;
+    return await db<Event>("events").select("*").where("id", eventId).first();
 }
 
 export async function findByEventAndUser(
     eventId: string,
     userId: string,
 ): Promise<Event | undefined> {
-    const [event] = await db<Event>("events")
+    return await db<Event>("events")
         .select("*")
         .where("id", eventId)
-        .where("userId", userId);
-
-    return event;
+        .where("userId", userId)
+        .first();
 }
 
 export async function create(body: CreateEventInput, userId: string): Promise<Event> {
