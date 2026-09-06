@@ -1,35 +1,80 @@
+import type { Knex } from "knex";
 import { db } from "../db/index.js";
-import type { Event } from "../types/event.js";
+import type { Event, EventDetails, EventTag } from "../types/event.js";
 import type { CreateEventInput, UpdateEventInput } from "../validations/event.validation.js";
 
 export async function findAll(userId: string): Promise<Event[]> {
-    return await db<Event>("events").select("*").where("userId", userId);
+    return db<Event>("events")
+        .select(
+            "events.*",
+            db.raw(`
+                COALESCE(
+                    ARRAY_AGG(event_tags.tag_id)
+                    FILTER (WHERE event_tags.tag_id IS NOT NULL),
+                    '{}'
+                ) AS tags
+            `),
+        )
+        .leftJoin("event_tags", "events.id", "event_tags.event_id")
+        .where("events.userId", userId)
+        .groupBy("events.id");
 }
 
 export async function findById(eventId: string): Promise<Event | undefined> {
-    const [event] = await db<Event>("events").select("*").where("id", eventId);
-
-    return event;
+    return await db<Event>("events").select("*").where("id", eventId).first();
 }
 
 export async function findByEventAndUser(
     eventId: string,
     userId: string,
-): Promise<Event | undefined> {
-    const [event] = await db<Event>("events")
-        .select("*")
-        .where("id", eventId)
-        .where("userId", userId);
-
-    return event;
+): Promise<EventDetails | undefined> {
+    return db<Event>("events")
+        .select(
+            "events.*",
+            db.raw(`
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', tags.id,
+                            'title', tags.title
+                        )
+                    ) FILTER (WHERE tags.id IS NOT NULL),
+                    '[]'
+                ) AS tags
+            `),
+        )
+        .leftJoin("event_tags", "events.id", "event_tags.event_id")
+        .leftJoin("tags", "event_tags.tag_id", "tags.id")
+        .where("events.id", eventId)
+        .where("events.user_id", userId)
+        .groupBy("events.id")
+        .first();
 }
 
-export async function create(body: CreateEventInput, userId: string): Promise<Event> {
-    const [event] = await db<Event>("events")
-        .insert({ ...body, userId })
-        .returning("*");
+export async function create(
+    body: Omit<CreateEventInput, "tags">,
+    tags: string[] = [],
+    userId: string,
+): Promise<Event> {
+    return db.transaction(async (tx: Knex.Transaction) => {
+        const [event] = await tx<Event>("events")
+            .insert({ ...body, userId })
+            .returning("*");
 
-    return event as Event;
+        if (tags.length > 0) {
+            await tx<EventTag>("event_tags").insert(
+                tags.map((tagId) => ({
+                    eventId: event!.id,
+                    tagId,
+                })),
+            );
+        }
+
+        return {
+            ...event!,
+            tags,
+        };
+    });
 }
 
 export async function update(
@@ -37,16 +82,62 @@ export async function update(
     body: UpdateEventInput,
     userId: string,
 ): Promise<Event | undefined> {
-    const updateData = Object.fromEntries(
-        Object.entries(body).filter(([, value]) => value !== undefined),
-    );
+    return db.transaction(async (tx: Knex.Transaction) => {
+        const { tags, ...eventData } = body;
 
-    const [event] = await db<Event>("events")
-        .where({ id: eventId, userId })
-        .update({ ...updateData, updatedAt: new Date() })
-        .returning("*");
+        const updateData = Object.fromEntries(
+            Object.entries(eventData).filter(([, value]) => value !== undefined),
+        );
 
-    return event;
+        const [event] = await tx<Event>("events")
+            .where({
+                id: eventId,
+                userId,
+            })
+            .update({
+                ...updateData,
+                updatedAt: new Date(),
+            })
+            .returning("*");
+
+        if (!event) {
+            return undefined;
+        }
+
+        if (tags !== undefined) {
+            await tx("event_tags").where("event_id", eventId).delete();
+
+            if (tags.length > 0) {
+                await tx("event_tags").insert(
+                    tags.map((tagId) => ({
+                        eventId,
+                        tagId,
+                    })),
+                );
+            }
+        }
+
+        const updatedEvent = await tx<Event>("events")
+            .select(
+                "events.*",
+                tx.raw(`
+                    COALESCE(
+                        ARRAY_AGG(event_tags.tag_id)
+                        FILTER (WHERE event_tags.tag_id IS NOT NULL),
+                        '{}'
+                    ) AS tags
+                `),
+            )
+            .leftJoin("event_tags", "events.id", "event_tags.event_id")
+            .where({
+                "events.id": eventId,
+                "events.userId": userId,
+            })
+            .groupBy("events.id")
+            .first();
+
+        return updatedEvent;
+    });
 }
 
 export async function remove(eventId: string, userId: string): Promise<number> {

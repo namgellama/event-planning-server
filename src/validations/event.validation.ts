@@ -13,6 +13,12 @@ export const createEventSchema = z.object({
         .min(3, "Location must be 3 characters")
         .max(255, "Location must not exceed 255 characters"),
     visibility: z.enum(["public", "private"]).default("public"),
+    tags: z
+        .array(z.uuid())
+        .refine((tags) => new Set(tags).size === tags.length, {
+            message: "Tags must be unique",
+        })
+        .optional(),
 });
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;

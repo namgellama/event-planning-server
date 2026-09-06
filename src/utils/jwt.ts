@@ -12,8 +12,6 @@ export function verifyToken(token: string, secret: string) {
     try {
         return jwt.verify(token, secret) as { sub: string };
     } catch (error) {
-        console.log("🚀 ~ verifyToken ~ error:", error);
-
         if (error instanceof jwt.TokenExpiredError) {
             throw new AppError(401, "Token expired");
         }
