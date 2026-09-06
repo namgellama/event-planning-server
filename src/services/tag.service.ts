@@ -1,10 +1,25 @@
 import { AppError } from "../errors/app-error.js";
 import * as tagRepository from "../repositories/tag.repository.js";
+import type { PaginatedResponse } from "../types/pagination.js";
 import type { Tag } from "../types/tag.js";
 import type { CreateTagInput } from "../validations/tag.validation.js";
 
-export async function getAll(userId: string): Promise<Tag[]> {
-    return tagRepository.findAll(userId);
+export async function getAll(
+    userId: string,
+    page: number,
+    limit: number,
+): Promise<PaginatedResponse<Tag>> {
+    const { tags, total } = await tagRepository.findAll(userId, page, limit);
+
+    return {
+        items: tags,
+        pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+        },
+    };
 }
 
 export async function getById(tagId: string, userId: string): Promise<Tag> {
