@@ -2,15 +2,17 @@ import { AppError } from "../errors/app-error.js";
 import * as eventRespository from "../repositories/event.repository.js";
 import type { Event, EventDetails } from "../types/event.js";
 import type { PaginatedResponse } from "../types/pagination.js";
-import type { CreateEventInput, UpdateEventInput } from "../validations/event.validation.js";
+import type {
+    CreateEventInput,
+    EventQuery,
+    UpdateEventInput,
+} from "../validations/event.validation.js";
 import * as tagService from "./tag.service.js";
 
-export async function getAll(
-    userId: string,
-    page: number,
-    limit: number,
-): Promise<PaginatedResponse<Event>> {
-    const { events, total } = await eventRespository.findAll(userId, page, limit);
+export async function getAll(userId: string, query: EventQuery): Promise<PaginatedResponse<Event>> {
+    const { page, limit, visibility } = query;
+
+    const { events, total } = await eventRespository.findAll(userId, page, limit, visibility);
 
     return {
         items: events,

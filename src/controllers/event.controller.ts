@@ -2,12 +2,12 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async-handler.middleware.js";
 import * as eventService from "../services/event.service.js";
 import { sendResponse } from "../utils/response.js";
-import { paginationSchema } from "../validations/pagination.validation.js";
+import { eventQuerySchema } from "../validations/event.validation.js";
 
 export const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit } = paginationSchema.parse(req.query);
+    const query = eventQuerySchema.parse(req.query);
 
-    const events = await eventService.getAll(req.user.id, page, limit);
+    const events = await eventService.getAll(req.user.id, query);
 
     sendResponse(res, { ...events }, "All events fetched successfully");
 });

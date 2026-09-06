@@ -7,11 +7,21 @@ export async function findAll(
     userId: string,
     page: number,
     limit: number,
+    visibility?: "public" | "private",
 ): Promise<{ events: Event[]; total: number }> {
     const offset = (page - 1) * limit;
 
+    const baseQuery = db<Event>("events")
+        .where("userId", userId)
+        .modify((query) => {
+            if (visibility) {
+                query.where("visibility", visibility);
+            }
+        });
+
     const [events, countResult] = await Promise.all([
-        db<Event>("events")
+        baseQuery
+            .clone()
             .select(
                 "events.*",
                 db.raw(`
@@ -23,13 +33,12 @@ export async function findAll(
             `),
             )
             .leftJoin("event_tags", "events.id", "event_tags.event_id")
-            .where("events.userId", userId)
             .groupBy("events.id")
             .orderBy("events.createdAt", "desc")
             .limit(limit)
             .offset(offset),
 
-        db<Event>("events").where("userId", userId).count<{ count: string }>("id").first(),
+        baseQuery.clone().count<{ count: string }>("id").first(),
     ]);
 
     return {

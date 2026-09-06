@@ -1,4 +1,5 @@
 import z from "zod";
+import { paginationSchema } from "./pagination.validation.js";
 
 export const createEventSchema = z.object({
     title: z
@@ -26,3 +27,9 @@ export type CreateEventInput = z.infer<typeof createEventSchema>;
 export const updateEventSchema = createEventSchema.partial();
 
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
+
+export const eventQuerySchema = paginationSchema.extend({
+    visibility: z.enum(["public", "private"]).optional(),
+});
+
+export type EventQuery = z.infer<typeof eventQuerySchema>;
