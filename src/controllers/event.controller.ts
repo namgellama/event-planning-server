@@ -2,11 +2,14 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async-handler.middleware.js";
 import * as eventService from "../services/event.service.js";
 import { sendResponse } from "../utils/response.js";
+import { eventQuerySchema } from "../validations/event.validation.js";
 
 export const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
-    const events = await eventService.getAll(req.user.id);
+    const query = eventQuerySchema.parse(req.query);
 
-    sendResponse(res, events, "All events fetched successfully");
+    const events = await eventService.getAll(req.user.id, query);
+
+    sendResponse(res, { ...events }, "All events fetched successfully");
 });
 
 export const getEvent = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {

@@ -2,8 +2,28 @@ import { db } from "../db/index.js";
 import type { Tag } from "../types/tag.js";
 import type { CreateTagInput, UpdateTagInput } from "../validations/tag.validation.js";
 
-export async function findAll(userId: string): Promise<Tag[]> {
-    return await db<Tag>("tags").select("*").where("userId", userId);
+export async function findAll(
+    userId: string,
+    page: number,
+    limit: number,
+): Promise<{ tags: Tag[]; total: number }> {
+    const offset = (page - 1) * limit;
+
+    const [tags, countResult] = await Promise.all([
+        db<Tag>("tags")
+            .select("*")
+            .where("userId", userId)
+            .orderBy("createdAt", "desc")
+            .limit(limit)
+            .offset(offset),
+
+        db<Tag>("tags").where("userId", userId).count<{ count: string }>("id").first(),
+    ]);
+
+    return {
+        tags,
+        total: Number(countResult?.count ?? 0),
+    };
 }
 
 export async function findById(tagId: string): Promise<Tag | undefined> {

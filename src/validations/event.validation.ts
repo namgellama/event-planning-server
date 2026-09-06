@@ -1,4 +1,5 @@
 import z from "zod";
+import { paginationSchema } from "./pagination.validation.js";
 
 export const createEventSchema = z.object({
     title: z
@@ -12,7 +13,7 @@ export const createEventSchema = z.object({
         .trim()
         .min(3, "Location must be 3 characters")
         .max(255, "Location must not exceed 255 characters"),
-    visibility: z.enum(["public", "private"]).default("public"),
+    type: z.enum(["public", "private"]).default("public"),
     tags: z
         .array(z.uuid())
         .refine((tags) => new Set(tags).size === tags.length, {
@@ -26,3 +27,9 @@ export type CreateEventInput = z.infer<typeof createEventSchema>;
 export const updateEventSchema = createEventSchema.partial();
 
 export type UpdateEventInput = z.infer<typeof updateEventSchema>;
+
+export const eventQuerySchema = paginationSchema.extend({
+    type: z.enum(["public", "private"]).optional(),
+});
+
+export type EventQuery = z.infer<typeof eventQuerySchema>;

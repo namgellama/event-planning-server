@@ -3,21 +3,48 @@ import { db } from "../db/index.js";
 import type { Event, EventDetails, EventTag } from "../types/event.js";
 import type { CreateEventInput, UpdateEventInput } from "../validations/event.validation.js";
 
-export async function findAll(userId: string): Promise<Event[]> {
-    return db<Event>("events")
-        .select(
-            "events.*",
-            db.raw(`
+export async function findAll(
+    userId: string,
+    page: number,
+    limit: number,
+    type?: "public" | "private",
+): Promise<{ events: Event[]; total: number }> {
+    const offset = (page - 1) * limit;
+
+    const baseQuery = db<Event>("events")
+        .where("userId", userId)
+        .modify((query) => {
+            if (type) {
+                query.where("type", type);
+            }
+        });
+
+    const [events, countResult] = await Promise.all([
+        baseQuery
+            .clone()
+            .select(
+                "events.*",
+                db.raw(`
                 COALESCE(
                     ARRAY_AGG(event_tags.tag_id)
                     FILTER (WHERE event_tags.tag_id IS NOT NULL),
                     '{}'
                 ) AS tags
             `),
-        )
-        .leftJoin("event_tags", "events.id", "event_tags.event_id")
-        .where("events.userId", userId)
-        .groupBy("events.id");
+            )
+            .leftJoin("event_tags", "events.id", "event_tags.event_id")
+            .groupBy("events.id")
+            .orderBy("events.createdAt", "desc")
+            .limit(limit)
+            .offset(offset),
+
+        baseQuery.clone().count<{ count: string }>("id").first(),
+    ]);
+
+    return {
+        events,
+        total: Number(countResult?.count ?? 0),
+    };
 }
 
 export async function findById(eventId: string): Promise<Event | undefined> {
