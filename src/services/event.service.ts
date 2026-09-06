@@ -2,6 +2,7 @@ import { AppError } from "../errors/app-error.js";
 import * as eventRespository from "../repositories/event.repository.js";
 import type { Event } from "../types/event.js";
 import type { CreateEventInput, UpdateEventInput } from "../validations/event.validation.js";
+import * as tagService from "./tag.service.js";
 
 export async function getAll(userId: string): Promise<Event[]> {
     return eventRespository.findAll(userId);
@@ -18,7 +19,17 @@ export async function getById(eventId: string, userId: string): Promise<Event> {
 }
 
 export async function create(body: CreateEventInput, userId: string): Promise<Event> {
-    return eventRespository.create(body, userId);
+    const { tags = [], ...eventData } = body;
+
+    if (tags.length > 0) {
+        const existingTags = await tagService.getByIds(tags, userId);
+
+        if (existingTags.length !== tags.length) {
+            throw new AppError(404, "One or more tags not found");
+        }
+    }
+
+    return eventRespository.create(eventData, tags, userId);
 }
 
 export async function update(

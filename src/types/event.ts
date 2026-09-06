@@ -6,3 +6,8 @@ export type Event = CreateEventInput & {
     updatedAt: Date;
     userId: string;
 };
+
+export type EventTag = {
+    eventId: string;
+    tagId: string;
+};

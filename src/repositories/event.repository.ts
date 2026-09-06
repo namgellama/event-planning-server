@@ -1,5 +1,6 @@
+import type { Knex } from "knex";
 import { db } from "../db/index.js";
-import type { Event } from "../types/event.js";
+import type { Event, EventTag } from "../types/event.js";
 import type { CreateEventInput, UpdateEventInput } from "../validations/event.validation.js";
 
 export async function findAll(userId: string): Promise<Event[]> {
@@ -21,12 +22,30 @@ export async function findByEventAndUser(
         .first();
 }
 
-export async function create(body: CreateEventInput, userId: string): Promise<Event> {
-    const [event] = await db<Event>("events")
-        .insert({ ...body, userId })
-        .returning("*");
+export async function create(
+    body: Omit<CreateEventInput, "tags">,
+    tags: string[] = [],
+    userId: string,
+): Promise<Event> {
+    return db.transaction(async (tx: Knex.Transaction) => {
+        const [event] = await tx<Event>("events")
+            .insert({ ...body, userId })
+            .returning("*");
 
-    return event!;
+        if (tags.length > 0) {
+            await tx<EventTag>("event_tags").insert(
+                tags.map((tagId) => ({
+                    eventId: event!.id,
+                    tagId,
+                })),
+            );
+        }
+
+        return {
+            ...event!,
+            tags,
+        };
+    });
 }
 
 export async function update(
