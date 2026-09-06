@@ -1,6 +1,6 @@
 import { AppError } from "../errors/app-error.js";
 import * as eventRespository from "../repositories/event.repository.js";
-import type { Event } from "../types/event.js";
+import type { Event, EventDetails } from "../types/event.js";
 import type { CreateEventInput, UpdateEventInput } from "../validations/event.validation.js";
 import * as tagService from "./tag.service.js";
 
@@ -8,7 +8,7 @@ export async function getAll(userId: string): Promise<Event[]> {
     return eventRespository.findAll(userId);
 }
 
-export async function getById(eventId: string, userId: string): Promise<Event> {
+export async function getById(eventId: string, userId: string): Promise<EventDetails> {
     const event = await eventRespository.findByEventAndUser(eventId, userId);
 
     if (!event) {
