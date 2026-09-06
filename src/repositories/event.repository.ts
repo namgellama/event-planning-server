@@ -7,15 +7,15 @@ export async function findAll(
     userId: string,
     page: number,
     limit: number,
-    visibility?: "public" | "private",
+    type?: "public" | "private",
 ): Promise<{ events: Event[]; total: number }> {
     const offset = (page - 1) * limit;
 
     const baseQuery = db<Event>("events")
         .where("userId", userId)
         .modify((query) => {
-            if (visibility) {
-                query.where("visibility", visibility);
+            if (type) {
+                query.where("type", type);
             }
         });
 
