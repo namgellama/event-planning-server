@@ -1,6 +1,6 @@
 import { AppError } from "../errors/app-error.js";
 import * as eventRespository from "../repositories/event.repository.js";
-import type { Event, EventDetails } from "../types/event.js";
+import type { Event } from "../types/event.js";
 import type { PaginatedResponse } from "../types/pagination.js";
 import type {
     CreateEventInput,
@@ -25,7 +25,7 @@ export async function getAll(userId: string, query: EventQuery): Promise<Paginat
     };
 }
 
-export async function getById(eventId: string, userId: string): Promise<EventDetails> {
+export async function getById(eventId: string, userId: string): Promise<Event> {
     const event = await eventRespository.findByEventAndUser(eventId, userId);
 
     if (!event) {

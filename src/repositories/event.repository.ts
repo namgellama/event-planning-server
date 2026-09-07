@@ -1,6 +1,6 @@
 import type { Knex } from "knex";
 import { db } from "../db/index.js";
-import type { Event, EventDetails, EventTag } from "../types/event.js";
+import type { Event, EventTag } from "../types/event.js";
 import type { CreateEventInput, UpdateEventInput } from "../validations/event.validation.js";
 
 export async function findAll(
@@ -12,7 +12,7 @@ export async function findAll(
     const offset = (page - 1) * limit;
 
     const baseQuery = db<Event>("events")
-        .where("userId", userId)
+        .where("events.userId", userId)
         .modify((query) => {
             if (type) {
                 query.where("type", type);
@@ -25,20 +25,25 @@ export async function findAll(
             .select(
                 "events.*",
                 db.raw(`
-                COALESCE(
-                    ARRAY_AGG(event_tags.tag_id)
-                    FILTER (WHERE event_tags.tag_id IS NOT NULL),
-                    '{}'
-                ) AS tags
-            `),
+                    COALESCE(
+                        JSON_AGG(
+                            JSON_BUILD_OBJECT(
+                                'id', tags.id,
+                                'title', tags.title
+                            )
+                        ) FILTER (WHERE tags.id IS NOT NULL),
+                        '[]'
+                    ) AS tags
+                `),
             )
             .leftJoin("event_tags", "events.id", "event_tags.event_id")
+            .leftJoin("tags", "event_tags.tag_id", "tags.id")
             .groupBy("events.id")
             .orderBy("events.createdAt", "desc")
             .limit(limit)
             .offset(offset),
 
-        baseQuery.clone().count<{ count: string }>("id").first(),
+        baseQuery.clone().count<{ count: string }>("events.id").first(),
     ]);
 
     return {
@@ -54,7 +59,7 @@ export async function findById(eventId: string): Promise<Event | undefined> {
 export async function findByEventAndUser(
     eventId: string,
     userId: string,
-): Promise<EventDetails | undefined> {
+): Promise<Event | undefined> {
     return db<Event>("events")
         .select(
             "events.*",
@@ -82,7 +87,7 @@ export async function create(
     body: Omit<CreateEventInput, "tags">,
     tags: string[] = [],
     userId: string,
-): Promise<Event> {
+): Promise<Omit<Event, "tags"> & { tags: string[] }> {
     return db.transaction(async (tx: Knex.Transaction) => {
         const [event] = await tx<Event>("events")
             .insert({ ...body, userId })
@@ -108,7 +113,7 @@ export async function update(
     eventId: string,
     body: UpdateEventInput,
     userId: string,
-): Promise<Event | undefined> {
+): Promise<(Omit<Event, "tags"> & { tags: string[] }) | undefined> {
     return db.transaction(async (tx: Knex.Transaction) => {
         const { tags, ...eventData } = body;
 

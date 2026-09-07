@@ -6,10 +6,6 @@ export type Event = Omit<CreateEventInput, "tags"> & {
     createdAt: Date;
     updatedAt: Date;
     userId: string;
-    tags: string[];
-};
-
-export type EventDetails = Omit<Event, "tags"> & {
     tags: Pick<Tag, "id" | "title">[];
 };
 
