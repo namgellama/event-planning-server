@@ -1,17 +1,18 @@
 import type { Knex } from "knex";
 import { db } from "../db/index.js";
 import type { Event, EventTag } from "../types/event.js";
-import type { CreateEventInput, UpdateEventInput } from "../validations/event.validation.js";
+import type {
+    CreateEventInput,
+    EventQuery,
+    UpdateEventInput,
+} from "../validations/event.validation.js";
 
 export async function findAll(
     userId: string,
-    page: number,
-    limit: number,
-    type?: "public" | "private",
-    search?: string,
-    sortBy: "date" | "createdAt" = "createdAt",
-    sortOrder: "asc" | "desc" = "desc",
+    query: EventQuery,
 ): Promise<{ events: Event[]; total: number }> {
+    const { page, limit, type, tags, search, sortBy, sortOrder } = query;
+
     const offset = (page - 1) * limit;
 
     const sortColumn = {
@@ -32,7 +33,17 @@ export async function findAll(
                 query.where((builder) => {
                     builder
                         .whereILike("events.title", searchTerm)
+                        .orWhereILike("events.description", searchTerm)
                         .orWhereILike("events.location", searchTerm);
+                });
+            }
+
+            if (tags?.length) {
+                query.whereExists(function () {
+                    this.select(db.raw("1"))
+                        .from("event_tags")
+                        .whereRaw("event_tags.event_id = events.id")
+                        .whereIn("event_tags.tag_id", tags);
                 });
             }
         });

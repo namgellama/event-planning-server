@@ -31,8 +31,18 @@ export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 
 export const eventQuerySchema = paginationSchema.extend({
     type: z.enum(["public", "private"]).optional(),
+    tags: z
+        .string()
+        .transform((value) =>
+            value
+                .split(",")
+                .map((tag) => tag.trim())
+                .filter(Boolean),
+        )
+        .pipe(z.array(z.uuid()))
+        .optional(),
     search: z.string().trim().optional(),
-    sortBy: z.enum(["date", "createdAt"]).optional(),
+    sortBy: z.enum(["date", "createdAt"]).optional().default("createdAt"),
     sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
 });
 
