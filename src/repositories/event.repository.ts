@@ -8,6 +8,7 @@ export async function findAll(
     page: number,
     limit: number,
     type?: "public" | "private",
+    search?: string,
 ): Promise<{ events: Event[]; total: number }> {
     const offset = (page - 1) * limit;
 
@@ -16,6 +17,16 @@ export async function findAll(
         .modify((query) => {
             if (type) {
                 query.where("type", type);
+            }
+
+            if (search?.trim()) {
+                const searchTerm = `%${search.trim()}%`;
+
+                query.where((builder) => {
+                    builder
+                        .whereILike("events.title", searchTerm)
+                        .orWhereILike("events.location", searchTerm);
+                });
             }
         });
 

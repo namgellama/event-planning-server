@@ -10,9 +10,9 @@ import type {
 import * as tagService from "./tag.service.js";
 
 export async function getAll(userId: string, query: EventQuery): Promise<PaginatedResponse<Event>> {
-    const { page, limit, type } = query;
+    const { page, limit, type, search } = query;
 
-    const { events, total } = await eventRespository.findAll(userId, page, limit, type);
+    const { events, total } = await eventRespository.findAll(userId, page, limit, type, search);
 
     return {
         items: events,
@@ -35,7 +35,10 @@ export async function getById(eventId: string, userId: string): Promise<Event> {
     return event;
 }
 
-export async function create(body: CreateEventInput, userId: string): Promise<Event> {
+export async function create(
+    body: CreateEventInput,
+    userId: string,
+): Promise<Omit<Event, "tags"> & { tags: string[] }> {
     const { tags = [], ...eventData } = body;
 
     if (tags.length > 0) {
@@ -53,7 +56,7 @@ export async function update(
     eventId: string,
     body: UpdateEventInput,
     userId: string,
-): Promise<Event> {
+): Promise<Omit<Event, "tags"> & { tags: string[] }> {
     const event = await eventRespository.update(eventId, body, userId);
 
     if (!event) {
