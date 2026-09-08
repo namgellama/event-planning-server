@@ -10,9 +10,17 @@ import type {
 import * as tagService from "./tag.service.js";
 
 export async function getAll(userId: string, query: EventQuery): Promise<PaginatedResponse<Event>> {
-    const { page, limit, type, search } = query;
+    const { page, limit, type, search, sortBy, sortOrder } = query;
 
-    const { events, total } = await eventRespository.findAll(userId, page, limit, type, search);
+    const { events, total } = await eventRespository.findAll(
+        userId,
+        page,
+        limit,
+        type,
+        search,
+        sortBy,
+        sortOrder,
+    );
 
     return {
         items: events,

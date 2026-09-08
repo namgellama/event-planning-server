@@ -9,8 +9,15 @@ export async function findAll(
     limit: number,
     type?: "public" | "private",
     search?: string,
+    sortBy: "date" | "createdAt" = "createdAt",
+    sortOrder: "asc" | "desc" = "desc",
 ): Promise<{ events: Event[]; total: number }> {
     const offset = (page - 1) * limit;
+
+    const sortColumn = {
+        date: "events.date",
+        createdAt: "events.createdAt",
+    }[sortBy];
 
     const baseQuery = db<Event>("events")
         .where("events.userId", userId)
@@ -50,7 +57,7 @@ export async function findAll(
             .leftJoin("event_tags", "events.id", "event_tags.event_id")
             .leftJoin("tags", "event_tags.tag_id", "tags.id")
             .groupBy("events.id")
-            .orderBy("events.createdAt", "desc")
+            .orderBy(sortColumn, sortOrder)
             .limit(limit)
             .offset(offset),
 
