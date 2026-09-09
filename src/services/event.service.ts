@@ -1,6 +1,6 @@
 import { AppError } from "../errors/app-error.js";
 import * as eventRespository from "../repositories/event.repository.js";
-import type { Event, EventDetails } from "../types/event.js";
+import type { Event } from "../types/event.js";
 import type { PaginatedResponse } from "../types/pagination.js";
 import type {
     CreateEventInput,
@@ -10,9 +10,12 @@ import type {
 import * as tagService from "./tag.service.js";
 
 export async function getAll(userId: string, query: EventQuery): Promise<PaginatedResponse<Event>> {
-    const { page, limit, type } = query;
+    const { page, limit } = query;
 
-    const { events, total } = await eventRespository.findAll(userId, page, limit, type);
+    const { events, total } = await eventRespository.findAll(userId, {
+        ...query,
+        tags: query.tags ? String(query.tags).split(",") : undefined,
+    });
 
     return {
         items: events,
@@ -25,7 +28,7 @@ export async function getAll(userId: string, query: EventQuery): Promise<Paginat
     };
 }
 
-export async function getById(eventId: string, userId: string): Promise<EventDetails> {
+export async function getById(eventId: string, userId: string): Promise<Event> {
     const event = await eventRespository.findByEventAndUser(eventId, userId);
 
     if (!event) {
@@ -35,7 +38,10 @@ export async function getById(eventId: string, userId: string): Promise<EventDet
     return event;
 }
 
-export async function create(body: CreateEventInput, userId: string): Promise<Event> {
+export async function create(
+    body: CreateEventInput,
+    userId: string,
+): Promise<Omit<Event, "tags"> & { tags: string[] }> {
     const { tags = [], ...eventData } = body;
 
     if (tags.length > 0) {
@@ -53,7 +59,7 @@ export async function update(
     eventId: string,
     body: UpdateEventInput,
     userId: string,
-): Promise<Event> {
+): Promise<Omit<Event, "tags"> & { tags: string[] }> {
     const event = await eventRespository.update(eventId, body, userId);
 
     if (!event) {
