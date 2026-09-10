@@ -14,3 +14,9 @@ export const createRsvp = asyncHandler(async (req: Request<{ id: string }>, res:
 
     sendResponse(res, rsvp, "Rsvp created successfully", 201);
 });
+
+export const updateRsvp = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const rsvp = await rsvpService.update(req.body, req.params.id, req.user.id);
+
+    sendResponse(res, rsvp, "Rsvp updated successfully");
+});

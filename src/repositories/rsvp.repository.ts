@@ -24,3 +24,19 @@ export async function create(
 
     return rsvp!;
 }
+
+export async function update(
+    body: CreateRsvpInput,
+    eventId: string,
+    userId: string,
+): Promise<Rsvp | undefined> {
+    const [rsvp] = await db<Rsvp>("rsvps")
+        .where({ eventId, userId })
+        .update({
+            ...body,
+            updatedAt: new Date(),
+        })
+        .returning("*");
+
+    return rsvp;
+}

@@ -17,11 +17,25 @@ export async function create(
 ): Promise<Rsvp> {
     await eventService.findById(eventId);
 
-    const existing = await rsvpRepository.findByEventAndUser(eventId, userId);
+    const rsvp = await rsvpRepository.findByEventAndUser(eventId, userId);
 
-    if (existing) {
+    if (rsvp) {
         throw new AppError(409, "You have already RSVP'd to this event");
     }
 
     return rsvpRepository.create(body, eventId, userId);
+}
+
+export async function update(
+    body: CreateRsvpInput,
+    eventId: string,
+    userId: string,
+): Promise<Rsvp> {
+    const rsvp = await rsvpRepository.update(body, eventId, userId);
+
+    if (!rsvp) {
+        throw new AppError(404, "Rsvp not found");
+    }
+
+    return rsvp;
 }

@@ -8,5 +8,6 @@ const router = Router({ mergeParams: true });
 
 router.get("/me", protect, rsvpController.fetchMyRsvp);
 router.post("/", protect, validateBody(createRsvpSchema), rsvpController.createRsvp);
+router.patch("/", protect, validateBody(createRsvpSchema), rsvpController.updateRsvp);
 
 export default router;
