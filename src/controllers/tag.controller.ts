@@ -2,12 +2,12 @@ import type { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/async-handler.middleware.js";
 import * as tagService from "../services/tag.service.js";
 import { sendResponse } from "../utils/response.js";
-import { paginationSchema } from "../validations/pagination.validation.js";
+import { tagQuerySchema } from "../validations/tag.validation.js";
 
 export const getAllTags = asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit } = paginationSchema.parse(req.query);
+    const query = tagQuerySchema.parse(req.query);
 
-    const tags = await tagService.getAll(req.user.id, page, limit);
+    const tags = await tagService.getAll(req.user.id, query);
 
     sendResponse(res, tags, "All tags fetched successfully");
 });
