@@ -7,13 +7,13 @@ import { tagQuerySchema } from "../validations/tag.validation.js";
 export const getAllTags = asyncHandler(async (req: Request, res: Response) => {
     const query = tagQuerySchema.parse(req.query);
 
-    const tags = await tagService.getAll(req.user.id, query);
+    const tags = await tagService.getAll(query);
 
     sendResponse(res, tags, "All tags fetched successfully");
 });
 
 export const getTag = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    const tag = await tagService.getById(req.params.id, req.user.id);
+    const tag = await tagService.getById(req.params.id);
 
     sendResponse(res, tag, "Tag fetched successfully");
 });

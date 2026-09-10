@@ -26,10 +26,20 @@ export async function protect(req: Request, _res: Response, next: NextFunction) 
 
         req.user = {
             id: user.id,
+            role: user.role,
         };
 
         next();
     } catch (error) {
         next(error);
     }
+}
+
+export async function admin(req: Request, _res: Response, next: NextFunction) {
+    if (req.user.role !== "admin") {
+        next(new AppError(403, "Not authorized - need admin access"));
+        return;
+    }
+
+    next();
 }

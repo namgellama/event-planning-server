@@ -36,9 +36,13 @@ export async function login(
         throw new AppError(401, "Invalid credentials");
     }
 
-    const accessToken = signToken({ sub: user.id }, env.JWT_ACCESS_SECRET, env.JWT_ACCESS_EXPIRY);
+    const accessToken = signToken(
+        { sub: user.id, role: user.role },
+        env.JWT_ACCESS_SECRET,
+        env.JWT_ACCESS_EXPIRY,
+    );
     const refreshToken = signToken(
-        { sub: user.id },
+        { sub: user.id, role: user.role },
         env.JWT_REFRESH_SECRET,
         env.JWT_REFRESH_EXPIRY,
     );
@@ -72,7 +76,11 @@ export async function refreshToken(req: Request): Promise<string> {
         throw new AppError(401, "User not found");
     }
 
-    return signToken({ sub: user.id }, env.JWT_ACCESS_SECRET, env.JWT_ACCESS_EXPIRY);
+    return signToken(
+        { sub: user.id, role: user.role },
+        env.JWT_ACCESS_SECRET,
+        env.JWT_ACCESS_EXPIRY,
+    );
 }
 
 export async function getMe(userId: string): Promise<Omit<User, "password">> {

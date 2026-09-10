@@ -9,10 +9,10 @@ import type {
 } from "../validations/event.validation.js";
 import * as tagService from "./tag.service.js";
 
-export async function getAll(userId: string, query: EventQuery): Promise<PaginatedResponse<Event>> {
+export async function getAll(query: EventQuery): Promise<PaginatedResponse<Event>> {
     const { page, limit } = query;
 
-    const { events, total } = await eventRespository.findAll(userId, {
+    const { events, total } = await eventRespository.findAll({
         ...query,
         tags: query.tags ? String(query.tags).split(",") : undefined,
     });
@@ -28,8 +28,8 @@ export async function getAll(userId: string, query: EventQuery): Promise<Paginat
     };
 }
 
-export async function getById(eventId: string, userId: string): Promise<Event> {
-    const event = await eventRespository.findByEventAndUser(eventId, userId);
+export async function getById(eventId: string): Promise<Event> {
+    const event = await eventRespository.findById(eventId);
 
     if (!event) {
         throw new AppError(404, "Event not found");
