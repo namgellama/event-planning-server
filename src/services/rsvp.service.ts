@@ -4,6 +4,12 @@ import * as eventService from "../services/event.service.js";
 import type { Rsvp } from "../types/rsvp.js";
 import type { CreateRsvpInput } from "../validations/rsvp.validation.js";
 
+export async function getByEventAndUser(eventId: string, userId: string): Promise<Rsvp | null> {
+    const rsvp = await rsvpRepository.findByEventAndUser(eventId, userId);
+
+    return rsvp ?? null;
+}
+
 export async function create(
     body: CreateRsvpInput,
     eventId: string,

@@ -6,6 +6,7 @@ import { createRsvpSchema } from "../validations/rsvp.validation.js";
 
 const router = Router({ mergeParams: true });
 
+router.get("/me", protect, rsvpController.fetchMyRsvp);
 router.post("/", protect, validateBody(createRsvpSchema), rsvpController.createRsvp);
 
 export default router;
