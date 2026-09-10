@@ -1,5 +1,5 @@
 import z from "zod";
-import { paginationSchema } from "./pagination.validation.js";
+import { paginationSchema, sortOrderSchema } from "./query.validation.js";
 
 export const createEventSchema = z.object({
     title: z
@@ -43,7 +43,7 @@ export const eventQuerySchema = paginationSchema.extend({
         .optional(),
     search: z.string().trim().optional(),
     sortBy: z.enum(["date", "createdAt"]).optional().default("createdAt"),
-    sortOrder: z.enum(["asc", "desc"]).optional().default("desc"),
+    ...sortOrderSchema.shape,
 });
 
 export type EventQuery = z.infer<typeof eventQuerySchema>;

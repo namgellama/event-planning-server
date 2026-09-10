@@ -1,23 +1,36 @@
 import { db } from "../db/index.js";
 import type { Tag } from "../types/tag.js";
-import type { CreateTagInput, UpdateTagInput } from "../validations/tag.validation.js";
+import type { CreateTagInput, TagQuery, UpdateTagInput } from "../validations/tag.validation.js";
 
 export async function findAll(
     userId: string,
-    page: number,
-    limit: number,
+    query: TagQuery,
 ): Promise<{ tags: Tag[]; total: number }> {
+    const { page, limit, search, sortBy, sortOrder } = query;
+
     const offset = (page - 1) * limit;
 
-    const [tags, countResult] = await Promise.all([
-        db<Tag>("tags")
-            .select("*")
-            .where("userId", userId)
-            .orderBy("createdAt", "desc")
-            .limit(limit)
-            .offset(offset),
+    const sortColumn = {
+        title: "title",
+        createdAt: "createdAt",
+    }[sortBy];
 
-        db<Tag>("tags").where("userId", userId).count<{ count: string }>("id").first(),
+    const baseQuery = db<Tag>("tags")
+        .where("userId", userId)
+        .modify((query) => {
+            if (search?.trim()) {
+                const searchTerm = `%${search.trim()}%`;
+
+                query.where((builder) => {
+                    builder.whereILike("title", searchTerm);
+                });
+            }
+        });
+
+    const [tags, countResult] = await Promise.all([
+        baseQuery.clone().select("*").orderBy(sortColumn, sortOrder).limit(limit).offset(offset),
+
+        baseQuery.clone().count<{ count: string }>("id").first(),
     ]);
 
     return {
