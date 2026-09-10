@@ -77,7 +77,11 @@ export async function findAll(query: EventQuery): Promise<{ events: Event[]; tot
     };
 }
 
-export async function findById(eventId: string): Promise<Event | undefined> {
+export async function findById(eventId: string): Promise<Omit<Event, "tags"> | undefined> {
+    return db<Event>("events").select("*").where("id", eventId).first();
+}
+
+export async function findByIdWithTags(eventId: string): Promise<Event | undefined> {
     return db<Event>("events")
         .select(
             "events.*",
@@ -190,5 +194,5 @@ export async function update(
 }
 
 export async function remove(eventId: string, userId: string): Promise<number> {
-    return await db<Event>("events").where({ id: eventId, userId }).delete();
+    return db<Event>("events").where({ id: eventId, userId }).delete();
 }

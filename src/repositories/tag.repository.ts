@@ -38,8 +38,8 @@ export async function findById(tagId: string): Promise<Tag | undefined> {
     return await db<Tag>("tags").select("*").where("id", tagId).first();
 }
 
-export async function findByIds(tagId: string[], userId: string): Promise<Tag[]> {
-    return await db<Tag>("tags").select("*").whereIn("id", tagId).where("userId", userId);
+export async function findByIds(tagId: string[]): Promise<Tag[]> {
+    return await db<Tag>("tags").select("*").whereIn("id", tagId);
 }
 
 export async function create(body: CreateTagInput, userId: string): Promise<Tag> {

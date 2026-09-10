@@ -7,6 +7,7 @@ import { errorHandler } from "./errors/error-handler.js";
 import { notFound } from "./errors/not-found.js";
 import authRoutes from "./routes/auth.route.js";
 import eventRoutes from "./routes/event.route.js";
+import rsvpRoutes from "./routes/rsvp.route.js";
 import tagRoutes from "./routes/tag.route.js";
 
 const app = express();
@@ -25,6 +26,7 @@ app.get("/health", (_req: Request, res: Response) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/tags", tagRoutes);
+app.use("/api/v1/events/:id/rsvps", rsvpRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

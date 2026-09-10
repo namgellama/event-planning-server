@@ -30,8 +30,8 @@ export async function getById(tagId: string): Promise<Tag> {
     return tag;
 }
 
-export async function getByIds(tagIds: string[], userId: string): Promise<Tag[]> {
-    return tagRepository.findByIds(tagIds, userId);
+export async function getByIds(tagIds: string[]): Promise<Tag[]> {
+    return tagRepository.findByIds(tagIds);
 }
 
 export async function create(body: CreateTagInput, userId: string): Promise<Tag> {

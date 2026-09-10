@@ -29,6 +29,16 @@ export async function getAll(query: EventQuery): Promise<PaginatedResponse<Event
 }
 
 export async function getById(eventId: string): Promise<Event> {
+    const event = await eventRespository.findByIdWithTags(eventId);
+
+    if (!event) {
+        throw new AppError(404, "Event not found");
+    }
+
+    return event;
+}
+
+export async function findById(eventId: string): Promise<Omit<Event, "tags">> {
     const event = await eventRespository.findById(eventId);
 
     if (!event) {
@@ -45,7 +55,7 @@ export async function create(
     const { tags = [], ...eventData } = body;
 
     if (tags.length > 0) {
-        const existingTags = await tagService.getByIds(tags, userId);
+        const existingTags = await tagService.getByIds(tags);
 
         if (existingTags.length !== tags.length) {
             throw new AppError(404, "One or more tags not found");
