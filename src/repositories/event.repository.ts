@@ -18,6 +18,7 @@ export async function findAll(
     const sortColumn = {
         date: "events.date",
         createdAt: "events.createdAt",
+        title: "events.title",
     }[sortBy];
 
     const baseQuery = db<Event>("events")
