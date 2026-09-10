@@ -7,13 +7,13 @@ import { eventQuerySchema } from "../validations/event.validation.js";
 export const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
     const query = eventQuerySchema.parse(req.query);
 
-    const events = await eventService.getAll(req.user.id, query);
+    const events = await eventService.getAll(query);
 
     sendResponse(res, { ...events }, "All events fetched successfully");
 });
 
 export const getEvent = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    const event = await eventService.getById(req.params.id, req.user.id);
+    const event = await eventService.getById(req.params.id);
 
     sendResponse(res, event, "Event fetched successfully");
 });

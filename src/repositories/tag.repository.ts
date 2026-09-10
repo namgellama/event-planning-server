@@ -2,10 +2,7 @@ import { db } from "../db/index.js";
 import type { Tag } from "../types/tag.js";
 import type { CreateTagInput, TagQuery, UpdateTagInput } from "../validations/tag.validation.js";
 
-export async function findAll(
-    userId: string,
-    query: TagQuery,
-): Promise<{ tags: Tag[]; total: number }> {
+export async function findAll(query: TagQuery): Promise<{ tags: Tag[]; total: number }> {
     const { page, limit, search, sortBy, sortOrder } = query;
 
     const offset = (page - 1) * limit;
@@ -15,17 +12,15 @@ export async function findAll(
         createdAt: "createdAt",
     }[sortBy];
 
-    const baseQuery = db<Tag>("tags")
-        .where("userId", userId)
-        .modify((query) => {
-            if (search?.trim()) {
-                const searchTerm = `%${search.trim()}%`;
+    const baseQuery = db<Tag>("tags").modify((query) => {
+        if (search?.trim()) {
+            const searchTerm = `%${search.trim()}%`;
 
-                query.where((builder) => {
-                    builder.whereILike("title", searchTerm);
-                });
-            }
-        });
+            query.where((builder) => {
+                builder.whereILike("title", searchTerm);
+            });
+        }
+    });
 
     const [tags, countResult] = await Promise.all([
         baseQuery.clone().select("*").orderBy(sortColumn, sortOrder).limit(limit).offset(offset),
@@ -45,10 +40,6 @@ export async function findById(tagId: string): Promise<Tag | undefined> {
 
 export async function findByIds(tagId: string[], userId: string): Promise<Tag[]> {
     return await db<Tag>("tags").select("*").whereIn("id", tagId).where("userId", userId);
-}
-
-export async function findByTagAndUser(tagId: string, userId: string): Promise<Tag | undefined> {
-    return await db<Tag>("tags").select("*").where("id", tagId).where("userId", userId).first();
 }
 
 export async function create(body: CreateTagInput, userId: string): Promise<Tag> {

@@ -4,10 +4,10 @@ import type { PaginatedResponse } from "../types/pagination.js";
 import type { Tag } from "../types/tag.js";
 import type { CreateTagInput, TagQuery } from "../validations/tag.validation.js";
 
-export async function getAll(userId: string, query: TagQuery): Promise<PaginatedResponse<Tag>> {
+export async function getAll(query: TagQuery): Promise<PaginatedResponse<Tag>> {
     const { page, limit } = query;
 
-    const { tags, total } = await tagRepository.findAll(userId, query);
+    const { tags, total } = await tagRepository.findAll(query);
 
     return {
         items: tags,
@@ -20,8 +20,8 @@ export async function getAll(userId: string, query: TagQuery): Promise<Paginated
     };
 }
 
-export async function getById(tagId: string, userId: string): Promise<Tag> {
-    const tag = await tagRepository.findByTagAndUser(tagId, userId);
+export async function getById(tagId: string): Promise<Tag> {
+    const tag = await tagRepository.findById(tagId);
 
     if (!tag) {
         throw new AppError(404, "Tag not found");

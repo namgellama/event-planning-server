@@ -7,10 +7,7 @@ import type {
     UpdateEventInput,
 } from "../validations/event.validation.js";
 
-export async function findAll(
-    userId: string,
-    query: EventQuery,
-): Promise<{ events: Event[]; total: number }> {
+export async function findAll(query: EventQuery): Promise<{ events: Event[]; total: number }> {
     const { page, limit, type, tags, search, sortBy, sortOrder } = query;
 
     const offset = (page - 1) * limit;
@@ -21,33 +18,31 @@ export async function findAll(
         title: "events.title",
     }[sortBy];
 
-    const baseQuery = db<Event>("events")
-        .where("events.userId", userId)
-        .modify((query) => {
-            if (type) {
-                query.where("type", type);
-            }
+    const baseQuery = db<Event>("events").modify((query) => {
+        if (type) {
+            query.where("type", type);
+        }
 
-            if (search?.trim()) {
-                const searchTerm = `%${search.trim()}%`;
+        if (search?.trim()) {
+            const searchTerm = `%${search.trim()}%`;
 
-                query.where((builder) => {
-                    builder
-                        .whereILike("events.title", searchTerm)
-                        .orWhereILike("events.description", searchTerm)
-                        .orWhereILike("events.location", searchTerm);
-                });
-            }
+            query.where((builder) => {
+                builder
+                    .whereILike("events.title", searchTerm)
+                    .orWhereILike("events.description", searchTerm)
+                    .orWhereILike("events.location", searchTerm);
+            });
+        }
 
-            if (tags?.length) {
-                query.whereExists(function () {
-                    this.select(db.raw("1"))
-                        .from("event_tags")
-                        .whereRaw("event_tags.event_id = events.id")
-                        .whereIn("event_tags.tag_id", tags);
-                });
-            }
-        });
+        if (tags?.length) {
+            query.whereExists(function () {
+                this.select(db.raw("1"))
+                    .from("event_tags")
+                    .whereRaw("event_tags.event_id = events.id")
+                    .whereIn("event_tags.tag_id", tags);
+            });
+        }
+    });
 
     const [events, countResult] = await Promise.all([
         baseQuery
@@ -83,13 +78,6 @@ export async function findAll(
 }
 
 export async function findById(eventId: string): Promise<Event | undefined> {
-    return await db<Event>("events").select("*").where("id", eventId).first();
-}
-
-export async function findByEventAndUser(
-    eventId: string,
-    userId: string,
-): Promise<Event | undefined> {
     return db<Event>("events")
         .select(
             "events.*",
@@ -108,7 +96,6 @@ export async function findByEventAndUser(
         .leftJoin("event_tags", "events.id", "event_tags.event_id")
         .leftJoin("tags", "event_tags.tag_id", "tags.id")
         .where("events.id", eventId)
-        .where("events.user_id", userId)
         .groupBy("events.id")
         .first();
 }
