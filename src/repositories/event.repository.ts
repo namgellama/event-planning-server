@@ -1,13 +1,16 @@
 import type { Knex } from "knex";
 import { db } from "../db/index.js";
-import type { Event, EventTag } from "../types/event.js";
+import type { EventTag } from "../types/event-tag.js";
+import type { Event, EventItem, EventListItem, EventWithTagIds } from "../types/event.js";
 import type {
     CreateEventInput,
     EventQuery,
     UpdateEventInput,
 } from "../validations/event.validation.js";
 
-export async function findAll(query: EventQuery): Promise<{ events: Event[]; total: number }> {
+export async function findAll(
+    query: EventQuery,
+): Promise<{ events: EventListItem[]; total: number }> {
     const { page, limit, type, tags, search, sortBy, sortOrder } = query;
 
     const offset = (page - 1) * limit;
@@ -82,11 +85,11 @@ export async function findAll(query: EventQuery): Promise<{ events: Event[]; tot
     };
 }
 
-export async function findById(eventId: string): Promise<Omit<Event, "tags"> | undefined> {
+export async function findById(eventId: string): Promise<Event | undefined> {
     return db<Event>("events").select("*").where("id", eventId).first();
 }
 
-export async function findByIdWithTags(eventId: string): Promise<Event | undefined> {
+export async function findByIdWithTags(eventId: string): Promise<EventItem | undefined> {
     return db<Event>("events")
         .select(
             "events.*",
@@ -113,7 +116,7 @@ export async function create(
     body: Omit<CreateEventInput, "tags">,
     tags: string[] = [],
     userId: string,
-): Promise<Omit<Event, "tags"> & { tags: string[] }> {
+): Promise<EventWithTagIds> {
     return db.transaction(async (tx: Knex.Transaction) => {
         const [event] = await tx<Event>("events")
             .insert({ ...body, userId })
@@ -139,7 +142,7 @@ export async function update(
     eventId: string,
     body: UpdateEventInput,
     userId: string,
-): Promise<(Omit<Event, "tags"> & { tags: string[] }) | undefined> {
+): Promise<EventWithTagIds | undefined> {
     return db.transaction(async (tx: Knex.Transaction) => {
         const { tags, ...eventData } = body;
 

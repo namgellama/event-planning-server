@@ -1,8 +1,9 @@
-import type { CreateTagInput } from "../validations/tag.validation.js";
-
-export type Tag = CreateTagInput & {
+export type Tag = {
     id: string;
+    title: string;
     userId: string;
     createdAt: Date;
     updatedAt: Date;
 };
+
+export type TagItem = Pick<Tag, "id" | "title">;
