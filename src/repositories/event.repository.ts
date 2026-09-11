@@ -10,6 +10,7 @@ import type {
 
 export async function findAll(
     query: EventQuery,
+    userId?: string,
 ): Promise<{ events: EventListItem[]; total: number }> {
     const { page, limit, type, tags, search, sortBy, sortOrder } = query;
 
@@ -58,6 +59,7 @@ export async function findAll(
             .clone()
             .select(
                 "events.*",
+
                 db.raw(`
                     COALESCE(
                         JSON_AGG(
@@ -69,6 +71,7 @@ export async function findAll(
                         '[]'
                     ) AS tags
                 `),
+
                 db.raw(`
                     JSON_BUILD_OBJECT(
                         'yes',
@@ -86,6 +89,20 @@ export async function findAll(
             .leftJoin("event_tags", "events.id", "event_tags.event_id")
             .leftJoin("tags", "event_tags.tag_id", "tags.id")
             .leftJoin("rsvps", "events.id", "rsvps.event_id")
+            .modify((query) => {
+                if (userId) {
+                    query
+                        .leftJoin("rsvps as my_rsvp", function () {
+                            this.on("events.id", "=", "my_rsvp.event_id").andOnVal(
+                                "my_rsvp.user_id",
+                                "=",
+                                userId,
+                            );
+                        })
+                        .select(db.raw(`MAX(my_rsvp.status) AS "myRsvp"`));
+                }
+            })
+
             .groupBy("events.id")
             .orderBy(sortColumn, sortOrder)
             .limit(limit)

@@ -7,7 +7,7 @@ import { eventQuerySchema } from "../validations/event.validation.js";
 export const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
     const query = eventQuerySchema.parse(req.query);
 
-    const events = await eventService.getAll(query);
+    const events = await eventService.getAll(query, req.user);
 
     sendResponse(res, { ...events }, "All events fetched successfully");
 });
