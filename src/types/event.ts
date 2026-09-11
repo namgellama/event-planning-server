@@ -2,6 +2,7 @@ import type { RsvpStatus } from "./rsvp.js";
 import type { TagItem } from "./tag.js";
 
 export type EventType = "public" | "private";
+export type EventStatus = "upcoming" | "completed";
 
 export type Event = {
     id: string;
@@ -10,6 +11,7 @@ export type Event = {
     date: string;
     location: string;
     type: EventType;
+    status: EventStatus;
     createdAt: Date;
     updatedAt: Date;
     userId: string;

@@ -15,6 +15,7 @@ export const createEventSchema = z.object({
         .min(3, "Location must be 3 characters")
         .max(255, "Location must not exceed 255 characters"),
     type: z.enum(["public", "private"]).default("public"),
+    status: z.enum(["upcoming", "completed"]).default("upcoming"),
     tags: z
         .array(z.uuid())
         .refine((tags) => new Set(tags).size === tags.length, {
