@@ -1,7 +1,8 @@
 import { AppError } from "../errors/app-error.js";
 import * as eventRespository from "../repositories/event.repository.js";
-import type { Event } from "../types/event.js";
+import type { Event, EventItem, EventListItem, EventWithTagIds } from "../types/event.js";
 import type { PaginatedResponse } from "../types/pagination.js";
+import type { User } from "../types/user.js";
 import type {
     CreateEventInput,
     EventQuery,
@@ -9,13 +10,19 @@ import type {
 } from "../validations/event.validation.js";
 import * as tagService from "./tag.service.js";
 
-export async function getAll(query: EventQuery): Promise<PaginatedResponse<Event>> {
+export async function getAll(
+    query: EventQuery,
+    user: Pick<User, "id" | "role">,
+): Promise<PaginatedResponse<EventListItem>> {
     const { page, limit } = query;
 
-    const { events, total } = await eventRespository.findAll({
-        ...query,
-        tags: query.tags ? String(query.tags).split(",") : undefined,
-    });
+    const { events, total } = await eventRespository.findAll(
+        {
+            ...query,
+            tags: query.tags ? String(query.tags).split(",") : undefined,
+        },
+        user.role === "user" ? user.id : undefined,
+    );
 
     return {
         items: events,
@@ -28,7 +35,7 @@ export async function getAll(query: EventQuery): Promise<PaginatedResponse<Event
     };
 }
 
-export async function getById(eventId: string): Promise<Event> {
+export async function getById(eventId: string): Promise<EventItem> {
     const event = await eventRespository.findByIdWithTags(eventId);
 
     if (!event) {
@@ -48,10 +55,7 @@ export async function findById(eventId: string): Promise<Omit<Event, "tags">> {
     return event;
 }
 
-export async function create(
-    body: CreateEventInput,
-    userId: string,
-): Promise<Omit<Event, "tags"> & { tags: string[] }> {
+export async function create(body: CreateEventInput, userId: string): Promise<EventWithTagIds> {
     const { tags = [], ...eventData } = body;
 
     if (tags.length > 0) {
@@ -69,7 +73,7 @@ export async function update(
     eventId: string,
     body: UpdateEventInput,
     userId: string,
-): Promise<Omit<Event, "tags"> & { tags: string[] }> {
+): Promise<EventWithTagIds> {
     const event = await eventRespository.update(eventId, body, userId);
 
     if (!event) {

@@ -1,21 +1,31 @@
 import type { Knex } from "knex";
 import { db } from "../db/index.js";
-import type { Event, EventTag } from "../types/event.js";
+import type { EventTag } from "../types/event-tag.js";
+import type { Event, EventItem, EventListItem, EventWithTagIds } from "../types/event.js";
 import type {
     CreateEventInput,
     EventQuery,
     UpdateEventInput,
 } from "../validations/event.validation.js";
 
-export async function findAll(query: EventQuery): Promise<{ events: Event[]; total: number }> {
+export async function findAll(
+    query: EventQuery,
+    userId?: string,
+): Promise<{ events: EventListItem[]; total: number }> {
     const { page, limit, type, tags, search, sortBy, sortOrder } = query;
 
     const offset = (page - 1) * limit;
+
+    const popularityColumn = db.raw(`
+    COUNT(DISTINCT rsvps.user_id)
+    FILTER (WHERE rsvps.status = 'yes')
+`);
 
     const sortColumn = {
         date: "events.date",
         createdAt: "events.createdAt",
         title: "events.title",
+        popularity: popularityColumn,
     }[sortBy];
 
     const baseQuery = db<Event>("events").modify((query) => {
@@ -49,6 +59,7 @@ export async function findAll(query: EventQuery): Promise<{ events: Event[]; tot
             .clone()
             .select(
                 "events.*",
+
                 db.raw(`
                     COALESCE(
                         JSON_AGG(
@@ -60,9 +71,38 @@ export async function findAll(query: EventQuery): Promise<{ events: Event[]; tot
                         '[]'
                     ) AS tags
                 `),
+
+                db.raw(`
+                    JSON_BUILD_OBJECT(
+                        'yes',
+                        COUNT(DISTINCT rsvps.user_id)
+                            FILTER (WHERE rsvps.status = 'yes'),
+                        'no',
+                        COUNT(DISTINCT rsvps.user_id)
+                            FILTER (WHERE rsvps.status = 'no'),
+                        'maybe',
+                        COUNT(DISTINCT rsvps.user_id)
+                            FILTER (WHERE rsvps.status = 'maybe')
+                    ) as rsvp
+                `),
             )
             .leftJoin("event_tags", "events.id", "event_tags.event_id")
             .leftJoin("tags", "event_tags.tag_id", "tags.id")
+            .leftJoin("rsvps", "events.id", "rsvps.event_id")
+            .modify((query) => {
+                if (userId) {
+                    query
+                        .leftJoin("rsvps as my_rsvp", function () {
+                            this.on("events.id", "=", "my_rsvp.event_id").andOnVal(
+                                "my_rsvp.user_id",
+                                "=",
+                                userId,
+                            );
+                        })
+                        .select(db.raw(`MAX(my_rsvp.status) AS "myRsvp"`));
+                }
+            })
+
             .groupBy("events.id")
             .orderBy(sortColumn, sortOrder)
             .limit(limit)
@@ -77,11 +117,11 @@ export async function findAll(query: EventQuery): Promise<{ events: Event[]; tot
     };
 }
 
-export async function findById(eventId: string): Promise<Omit<Event, "tags"> | undefined> {
+export async function findById(eventId: string): Promise<Event | undefined> {
     return db<Event>("events").select("*").where("id", eventId).first();
 }
 
-export async function findByIdWithTags(eventId: string): Promise<Event | undefined> {
+export async function findByIdWithTags(eventId: string): Promise<EventItem | undefined> {
     return db<Event>("events")
         .select(
             "events.*",
@@ -96,9 +136,23 @@ export async function findByIdWithTags(eventId: string): Promise<Event | undefin
                     '[]'
                 ) AS tags
             `),
+            db.raw(`
+                JSON_BUILD_OBJECT(
+                    'yes',
+                    COUNT(DISTINCT rsvps.user_id)
+                        FILTER (WHERE rsvps.status = 'yes'),
+                    'no',
+                    COUNT(DISTINCT rsvps.user_id)
+                        FILTER (WHERE rsvps.status = 'no'),
+                    'maybe',
+                    COUNT(DISTINCT rsvps.user_id)
+                        FILTER (WHERE rsvps.status = 'maybe')
+                ) as rsvp
+            `),
         )
         .leftJoin("event_tags", "events.id", "event_tags.event_id")
         .leftJoin("tags", "event_tags.tag_id", "tags.id")
+        .leftJoin("rsvps", "events.id", "rsvps.event_id")
         .where("events.id", eventId)
         .groupBy("events.id")
         .first();
@@ -108,7 +162,7 @@ export async function create(
     body: Omit<CreateEventInput, "tags">,
     tags: string[] = [],
     userId: string,
-): Promise<Omit<Event, "tags"> & { tags: string[] }> {
+): Promise<EventWithTagIds> {
     return db.transaction(async (tx: Knex.Transaction) => {
         const [event] = await tx<Event>("events")
             .insert({ ...body, userId })
@@ -134,7 +188,7 @@ export async function update(
     eventId: string,
     body: UpdateEventInput,
     userId: string,
-): Promise<(Omit<Event, "tags"> & { tags: string[] }) | undefined> {
+): Promise<EventWithTagIds | undefined> {
     return db.transaction(async (tx: Knex.Transaction) => {
         const { tags, ...eventData } = body;
 
