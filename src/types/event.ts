@@ -16,6 +16,9 @@ export type Event = {
 
 export type EventItem = Event & {
     tags: TagItem[];
+    going: number;
+    notGoing: number;
+    maybe: number;
 };
 
 export type EventListItem = Event & {

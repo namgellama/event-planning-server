@@ -104,9 +104,22 @@ export async function findByIdWithTags(eventId: string): Promise<EventItem | und
                     '[]'
                 ) AS tags
             `),
+            db.raw(`
+                COUNT(DISTINCT rsvps.user_id)
+                    FILTER (WHERE rsvps.status = 'yes')::int AS going
+            `),
+            db.raw(`
+                COUNT(DISTINCT rsvps.user_id)
+                    FILTER (WHERE rsvps.status = 'no')::int AS "notGoing"
+            `),
+            db.raw(`
+                COUNT(DISTINCT rsvps.user_id)
+                    FILTER (WHERE rsvps.status = 'maybe')::int AS maybe
+            `),
         )
         .leftJoin("event_tags", "events.id", "event_tags.event_id")
         .leftJoin("tags", "event_tags.tag_id", "tags.id")
+        .leftJoin("rsvps", "events.id", "rsvps.event_id")
         .where("events.id", eventId)
         .groupBy("events.id")
         .first();
