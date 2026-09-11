@@ -42,7 +42,7 @@ export const eventQuerySchema = paginationSchema.extend({
         .pipe(z.array(z.uuid()))
         .optional(),
     search: z.string().trim().optional(),
-    sortBy: z.enum(["date", "createdAt", "title"]).optional().default("createdAt"),
+    sortBy: z.enum(["date", "createdAt", "title", "popularity"]).optional().default("createdAt"),
     ...sortOrderSchema.shape,
 });
 

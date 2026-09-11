@@ -16,6 +16,7 @@ export async function findAll(query: EventQuery): Promise<{ events: Event[]; tot
         date: "events.date",
         createdAt: "events.createdAt",
         title: "events.title",
+        popularity: db.raw(`COUNT(DISTINCT rsvps.user_id)`),
     }[sortBy];
 
     const baseQuery = db<Event>("events").modify((query) => {
@@ -60,9 +61,13 @@ export async function findAll(query: EventQuery): Promise<{ events: Event[]; tot
                         '[]'
                     ) AS tags
                 `),
+                db.raw(`COUNT(DISTINCT rsvps.user_id)::int AS "popularity"`),
             )
             .leftJoin("event_tags", "events.id", "event_tags.event_id")
             .leftJoin("tags", "event_tags.tag_id", "tags.id")
+            .leftJoin("rsvps", function () {
+                this.on("events.id", "=", "rsvps.event_id").andOnVal("rsvps.status", "=", "yes");
+            })
             .groupBy("events.id")
             .orderBy(sortColumn, sortOrder)
             .limit(limit)
