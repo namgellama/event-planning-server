@@ -15,11 +15,16 @@ export async function findAll(
 
     const offset = (page - 1) * limit;
 
+    const popularityColumn = db.raw(`
+    COUNT(DISTINCT rsvps.user_id)
+    FILTER (WHERE rsvps.status = 'yes')
+`);
+
     const sortColumn = {
         date: "events.date",
         createdAt: "events.createdAt",
         title: "events.title",
-        popularity: db.raw(`COUNT(DISTINCT rsvps.user_id)`),
+        popularity: popularityColumn,
     }[sortBy];
 
     const baseQuery = db<Event>("events").modify((query) => {
@@ -64,13 +69,23 @@ export async function findAll(
                         '[]'
                     ) AS tags
                 `),
-                db.raw(`COUNT(DISTINCT rsvps.user_id)::int AS "popularity"`),
+                db.raw(`
+                    JSON_BUILD_OBJECT(
+                        'yes',
+                        COUNT(DISTINCT rsvps.user_id)
+                            FILTER (WHERE rsvps.status = 'yes'),
+                        'no',
+                        COUNT(DISTINCT rsvps.user_id)
+                            FILTER (WHERE rsvps.status = 'no'),
+                        'maybe',
+                        COUNT(DISTINCT rsvps.user_id)
+                            FILTER (WHERE rsvps.status = 'maybe')
+                    ) as rsvp
+                `),
             )
             .leftJoin("event_tags", "events.id", "event_tags.event_id")
             .leftJoin("tags", "event_tags.tag_id", "tags.id")
-            .leftJoin("rsvps", function () {
-                this.on("events.id", "=", "rsvps.event_id").andOnVal("rsvps.status", "=", "yes");
-            })
+            .leftJoin("rsvps", "events.id", "rsvps.event_id")
             .groupBy("events.id")
             .orderBy(sortColumn, sortOrder)
             .limit(limit)
@@ -105,16 +120,17 @@ export async function findByIdWithTags(eventId: string): Promise<EventItem | und
                 ) AS tags
             `),
             db.raw(`
-                COUNT(DISTINCT rsvps.user_id)
-                    FILTER (WHERE rsvps.status = 'yes')::int AS going
-            `),
-            db.raw(`
-                COUNT(DISTINCT rsvps.user_id)
-                    FILTER (WHERE rsvps.status = 'no')::int AS "notGoing"
-            `),
-            db.raw(`
-                COUNT(DISTINCT rsvps.user_id)
-                    FILTER (WHERE rsvps.status = 'maybe')::int AS maybe
+                JSON_BUILD_OBJECT(
+                    'yes',
+                    COUNT(DISTINCT rsvps.user_id)
+                        FILTER (WHERE rsvps.status = 'yes'),
+                    'no',
+                    COUNT(DISTINCT rsvps.user_id)
+                        FILTER (WHERE rsvps.status = 'no'),
+                    'maybe',
+                    COUNT(DISTINCT rsvps.user_id)
+                        FILTER (WHERE rsvps.status = 'maybe')
+                ) as rsvp
             `),
         )
         .leftJoin("event_tags", "events.id", "event_tags.event_id")

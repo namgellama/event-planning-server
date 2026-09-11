@@ -1,3 +1,4 @@
+import type { RsvpStatus } from "./rsvp.js";
 import type { TagItem } from "./tag.js";
 
 export type EventType = "public" | "private";
@@ -16,14 +17,12 @@ export type Event = {
 
 export type EventItem = Event & {
     tags: TagItem[];
-    going: number;
-    notGoing: number;
-    maybe: number;
+    rsvp: Record<RsvpStatus, number>;
 };
 
 export type EventListItem = Event & {
     tags: TagItem[];
-    popularity: number;
+    rsvp: Record<RsvpStatus, number>;
 };
 
 export type EventWithTagIds = Event & {
