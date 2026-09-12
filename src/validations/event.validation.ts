@@ -32,6 +32,7 @@ export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 
 export const eventQuerySchema = paginationSchema.extend({
     type: z.enum(["public", "private"]).optional(),
+    status: z.enum(["upcoming", "completed"]).optional(),
     tags: z
         .string()
         .transform((value) =>
