@@ -45,6 +45,7 @@ export const eventQuerySchema = paginationSchema.extend({
         .optional(),
     search: z.string().trim().optional(),
     sortBy: z.enum(["date", "createdAt", "title", "popularity"]).optional().default("createdAt"),
+    rsvpStatus: z.enum(["yes", "no", "maybe"]).optional(),
     ...sortOrderSchema.shape,
 });
 
