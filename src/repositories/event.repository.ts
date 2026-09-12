@@ -12,7 +12,7 @@ export async function findAll(
     query: EventQuery,
     userId?: string,
 ): Promise<{ events: EventListItem[]; total: number }> {
-    const { page, limit, type, tags, search, sortBy, sortOrder } = query;
+    const { page, limit, type, status, tags, search, sortBy, sortOrder, rsvpStatus } = query;
 
     const offset = (page - 1) * limit;
 
@@ -30,7 +30,11 @@ export async function findAll(
 
     const baseQuery = db<Event>("events").modify((query) => {
         if (type) {
-            query.where("type", type);
+            query.where("events.type", type);
+        }
+
+        if (status) {
+            query.where("events.status", status);
         }
 
         if (search?.trim()) {
@@ -50,6 +54,16 @@ export async function findAll(
                     .from("event_tags")
                     .whereRaw("event_tags.event_id = events.id")
                     .whereIn("event_tags.tag_id", tags);
+            });
+        }
+
+        if (rsvpStatus && userId) {
+            query.whereExists(function () {
+                this.select(db.raw("1"))
+                    .from("rsvps")
+                    .whereRaw("rsvps.event_id = events.id")
+                    .where("rsvps.user_id", userId)
+                    .where("rsvps.status", rsvpStatus);
             });
         }
     });
