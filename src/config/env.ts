@@ -21,6 +21,12 @@ const envSchema = z.object({
     JWT_ACCESS_EXPIRY: z.custom<ms.StringValue>(),
     JWT_REFRESH_SECRET: z.string(),
     JWT_REFRESH_EXPIRY: z.custom<ms.StringValue>(),
+    SMTP_HOST: z.string(),
+    SMTP_PORT: z.coerce.number().int().positive().default(587),
+    SMTP_USER: z.string(),
+    SMTP_PASSWORD: z.string(),
+    SMTP_FROM: z.string(),
+    REDIS_URL: z.string(),
 });
 
 const parsed = envSchema.safeParse(process.env);

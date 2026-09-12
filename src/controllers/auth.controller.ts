@@ -3,6 +3,18 @@ import { asyncHandler } from "../middlewares/async-handler.middleware.js";
 import * as authService from "../services/auth.service.js";
 import { sendResponse } from "../utils/response.js";
 
+export const sendOtp = asyncHandler(async (req: Request, res: Response) => {
+    await authService.sendOtp(req.body);
+
+    sendResponse(res, null, "Otp sent to your email successfully");
+});
+
+export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
+    await authService.verifyOtp(req.body);
+
+    sendResponse(res, null, "Otp verified successfully");
+});
+
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
     const user = await authService.register(req.body);
 
