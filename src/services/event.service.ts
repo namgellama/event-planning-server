@@ -19,7 +19,7 @@ export async function getAll(
     const { events, total } = await eventRespository.findAll(
         {
             ...query,
-            tags: query.tags ? String(query.tags).split(",") : undefined,
+            tags: query.tags,
         },
         user.role === "user" ? user.id : undefined,
     );

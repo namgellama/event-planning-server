@@ -6,7 +6,7 @@ import { sendResponse } from "../utils/response.js";
 export const sendOtp = asyncHandler(async (req: Request, res: Response) => {
     await authService.sendOtp(req.body);
 
-    sendResponse(res, null, "Otp sent to your email successfully");
+    sendResponse(res, null, "Otp has been sent to your email");
 });
 
 export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {

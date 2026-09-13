@@ -69,7 +69,7 @@ export async function register(body: RegisterUserInput): Promise<Omit<User, "pas
 
     const verified = await redis.get(verifiedKey);
 
-    if (verified === "1") {
+    if (verified !== "1") {
         throw new AppError(400, "Please verify your email first");
     }
 
