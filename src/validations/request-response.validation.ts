@@ -16,3 +16,24 @@ export const errorResponseSchema = (message: string) =>
     });
 
 export const nullDataSchema = z.unknown().nullable().openapi({ example: null });
+
+export const paginationSchema = z.object({
+    page: z.number().openapi({ example: 1 }),
+    limit: z.number().openapi({ example: 10 }),
+    total: z.number().openapi({ example: 42 }),
+    totalPages: z.number().openapi({ example: 5 }),
+});
+
+export const paginatedResponseSchema = <T extends z.ZodType>(itemSchema: T) =>
+    z.object({
+        items: z.array(itemSchema),
+        pagination: paginationSchema,
+    });
+
+export const idParamRequestSchema = (description: string) =>
+    z.object({
+        id: z.string().openapi({
+            example: "64f1c2e5a3b9d2f1a8e4c9d3",
+            description: description,
+        }),
+    });

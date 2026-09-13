@@ -1,4 +1,5 @@
 import z from "zod";
+import "../config/zod-extend.js";
 import { paginationSchema, sortOrderSchema } from "./query.validation.js";
 
 export const createTagSchema = z.object({
@@ -18,3 +19,10 @@ export const tagQuerySchema = paginationSchema.extend({
 });
 
 export type TagQuery = z.infer<typeof tagQuerySchema>;
+
+export const tagItemSchema = z
+    .object({
+        id: z.string().openapi({ example: "7c9e6679-7425-40de-944b-e07fc1f90ae7" }),
+        title: z.string().openapi({ example: "Tech" }),
+    })
+    .openapi("TagItem");

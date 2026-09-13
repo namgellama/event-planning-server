@@ -1,25 +1,40 @@
 import z from "zod";
 import "../config/zod-extend.js";
 
-export const sendOtpSchema = z.object({
-    email: z.email().trim(),
-});
+export const sendOtpSchema = z
+    .object({
+        email: z.email().trim().openapi({ example: "jane@example.com" }),
+    })
+    .openapi("SendOtpInput");
 
 export type SendOtpInput = z.infer<typeof sendOtpSchema>;
 
-export const verifyOtpSchema = z.object({
-    email: z.email().trim(),
-    otp: z.string().regex(/^\d{6}$/, "OTP must be 6 digits"),
-});
+export const verifyOtpSchema = z
+    .object({
+        email: z.email().trim().openapi({ example: "jane@example.com" }),
+        otp: z
+            .string()
+            .regex(/^\d{6}$/, "OTP must be 6 digits")
+            .openapi({ example: "123456" }),
+    })
+    .openapi("VerifyOtpInput");
 
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 
-export const registerUserSchema = z.object({
-    name: z.string().trim().min(3, "Name must be at least 3 characters"),
-    email: z.email().trim(),
-    password: z.string().min(5, "Password must be at least 5 characters"),
-});
-
+export const registerUserSchema = z
+    .object({
+        name: z
+            .string()
+            .trim()
+            .min(3, "Name must be at least 3 characters")
+            .openapi({ example: "Jane Doe" }),
+        email: z.email().trim().openapi({ example: "jane@example.com" }),
+        password: z
+            .string()
+            .min(5, "Password must be at least 5 characters")
+            .openapi({ example: "strongpw" }),
+    })
+    .openapi("RegisterUserInput");
 export type RegisterUserInput = z.infer<typeof registerUserSchema>;
 
 export const loginUserSchema = z
