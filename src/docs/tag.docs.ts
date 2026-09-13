@@ -1,38 +1,36 @@
 import { registry } from "../config/swagger.js";
 import {
-    createEventSchema,
-    eventItemSchema,
-    eventQuerySchema,
-    eventWithTagIdsSchema,
-    paginatedEventsSchema,
-    updateEventSchema,
-} from "../validations/event.validation.js";
-import {
     errorResponseSchema,
     idParamRequestSchema,
     successResponseSchema,
 } from "../validations/request-response.validation.js";
+import {
+    createTagSchema,
+    paginatedTagsSchema,
+    tagQuerySchema,
+    tagSchema,
+    updateTagSchema,
+} from "../validations/tag.validation.js";
 
-// Fetch all events
+// Fetch all tags
 registry.registerPath({
     method: "get",
-    path: "/events",
-    summary: "Fetch all events",
-    description:
-        "Returns a paginated, filterable list of events. Regular users only see events relevant to them; admins see all events.",
-    tags: ["Events"],
+    path: "/tags",
+    summary: "Fetch all tags",
+    description: "Returns a paginated, searchable, sortable list of tags.",
+    tags: ["Tags"],
     security: [{ bearerAuth: [] }],
     request: {
-        query: eventQuerySchema,
+        query: tagQuerySchema,
     },
     responses: {
         200: {
-            description: "All events fetched successfully",
+            description: "All tags fetched successfully",
             content: {
                 "application/json": {
                     schema: successResponseSchema(
-                        "All events fetched successfully",
-                        paginatedEventsSchema,
+                        "All tags fetched successfully",
+                        paginatedTagsSchema,
                     ),
                 },
             },
@@ -64,23 +62,23 @@ registry.registerPath({
     },
 });
 
-// Fetch event
+// Fetch tag
 registry.registerPath({
     method: "get",
-    path: "/events/{id}",
-    summary: "Fetch a single event by ID",
-    description: "Returns full event details, including tags and RSVP counts by status.",
-    tags: ["Events"],
+    path: "/tags/{id}",
+    summary: "Get a single tag by ID",
+    description: "Returns full details for a single tag.",
+    tags: ["Tags"],
     security: [{ bearerAuth: [] }],
     request: {
-        params: idParamRequestSchema("Event ID"),
+        params: idParamRequestSchema("Tag ID"),
     },
     responses: {
         200: {
-            description: "Event fetched successfully",
+            description: "Tag fetched successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema("Event fetched successfully", eventItemSchema),
+                    schema: successResponseSchema("Tag fetched successfully", tagSchema),
                 },
             },
         },
@@ -93,10 +91,10 @@ registry.registerPath({
             },
         },
         404: {
-            description: "Event not found",
+            description: "Tag not found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Event not found"),
+                    schema: errorResponseSchema("Tag not found"),
                 },
             },
         },
@@ -111,32 +109,29 @@ registry.registerPath({
     },
 });
 
-// Create event
+// Create tag
 registry.registerPath({
     method: "post",
-    path: "/events",
-    summary: "Create a new event",
-    description: "Creates a new event with optional tags. Admin-only.",
-    tags: ["Events"],
+    path: "/tags",
+    summary: "Create a new tag",
+    description: "Creates a new tag owned by the requesting admin.",
+    tags: ["Tags"],
     security: [{ bearerAuth: [] }],
     request: {
         body: {
             content: {
                 "application/json": {
-                    schema: createEventSchema,
+                    schema: createTagSchema,
                 },
             },
         },
     },
     responses: {
         201: {
-            description: "Event created successfully",
+            description: "Tag created successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema(
-                        "Event created successfully",
-                        eventWithTagIdsSchema,
-                    ),
+                    schema: successResponseSchema("Tag created successfully", tagSchema),
                 },
             },
         },
@@ -144,7 +139,7 @@ registry.registerPath({
             description: "Validation error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Invalid request body"),
+                    schema: errorResponseSchema("Title is required"),
                 },
             },
         },
@@ -164,14 +159,6 @@ registry.registerPath({
                 },
             },
         },
-        404: {
-            description: "One or more tags not found",
-            content: {
-                "application/json": {
-                    schema: errorResponseSchema("One or more tags not found"),
-                },
-            },
-        },
         500: {
             description: "Internal server error",
             content: {
@@ -183,33 +170,30 @@ registry.registerPath({
     },
 });
 
-// Update event
+// Update tag
 registry.registerPath({
     method: "patch",
-    path: "/events/{id}",
-    summary: "Update an event",
-    description: "Partially updates an event's fields. Admin-only.",
-    tags: ["Events"],
+    path: "/tags/{id}",
+    summary: "Update a tag",
+    description: "Updates a tag's title. Admin-only.",
+    tags: ["Tags"],
     security: [{ bearerAuth: [] }],
     request: {
-        params: idParamRequestSchema("Event ID"),
+        params: idParamRequestSchema("Tag ID"),
         body: {
             content: {
                 "application/json": {
-                    schema: updateEventSchema,
+                    schema: updateTagSchema,
                 },
             },
         },
     },
     responses: {
         200: {
-            description: "Event updated successfully",
+            description: "Tag updated successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema(
-                        "Event updated successfully",
-                        eventWithTagIdsSchema,
-                    ),
+                    schema: successResponseSchema("Tag updated successfully", tagSchema),
                 },
             },
         },
@@ -238,10 +222,10 @@ registry.registerPath({
             },
         },
         404: {
-            description: "Event not found",
+            description: "Tag not found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Event not found"),
+                    schema: errorResponseSchema("Tag not found"),
                 },
             },
         },
@@ -256,20 +240,21 @@ registry.registerPath({
     },
 });
 
-// Delete event
+// Delete tag
 registry.registerPath({
     method: "delete",
-    path: "/events/{id}",
-    summary: "Delete an event",
-    description: "Permanently deletes an event. Admin-only.",
-    tags: ["Events"],
+    path: "/tags/{id}",
+    summary: "Delete a tag",
+    description:
+        "Permanently deletes a tag owned by the requesting admin. Returns no response body.",
+    tags: ["Tags"],
     security: [{ bearerAuth: [] }],
     request: {
-        params: idParamRequestSchema("Event ID"),
+        params: idParamRequestSchema("Tag ID"),
     },
     responses: {
         204: {
-            description: "Event deleted successfully — no response body",
+            description: "Tag deleted successfully — no response body",
         },
         401: {
             description: "Unauthorized",
@@ -288,10 +273,10 @@ registry.registerPath({
             },
         },
         404: {
-            description: "Event not found",
+            description: "Tag not found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Event not found"),
+                    schema: errorResponseSchema("Tag not found"),
                 },
             },
         },
