@@ -2,6 +2,8 @@ import { OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
 import { registry } from "../config/swagger.js";
 import "./auth.docs.js";
 import "./event.docs.js";
+import "./rsvp.docs.js";
+import "./tag.docs.js";
 
 const generator = new OpenApiGeneratorV3(registry.definitions);
 
