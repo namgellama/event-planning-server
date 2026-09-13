@@ -1,4 +1,5 @@
 import z from "zod";
+import "../config/zod-extend.js";
 
 export const sendOtpSchema = z.object({
     email: z.email().trim(),
@@ -21,9 +22,29 @@ export const registerUserSchema = z.object({
 
 export type RegisterUserInput = z.infer<typeof registerUserSchema>;
 
-export const loginUserSchema = z.object({
-    email: z.email().trim(),
-    password: z.string().nonempty("Password is required"),
-});
+export const loginUserSchema = z
+    .object({
+        email: z.email().trim().openapi({ example: "jane@example.com" }),
+        password: z
+            .string()
+            .nonempty("Password is required")
+            .openapi({ example: "strongpassword123" }),
+    })
+    .openapi("LoginUserInput");
 
 export type LoginUserInput = z.infer<typeof loginUserSchema>;
+
+export const loginResponseSchema = z
+    .object({
+        accessToken: z.string().openapi({
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        }),
+        refreshToken: z.string().openapi({
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        }),
+    })
+    .openapi("LoginUserResponse");
+
+export const refreshTokenResponseSchema = z.string().openapi({
+    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+});
