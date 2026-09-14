@@ -7,6 +7,7 @@ import {
     registerUserSchema,
     sendOtpSchema,
     verify2FASchema,
+    verify2FASetupSchema,
     verifyEmailSchema,
 } from "../validations/auth.validation.js";
 
@@ -20,6 +21,12 @@ router.post("/logout", authController.logoutUser);
 router.post("/refresh-token", authController.refreshToken);
 router.get("/me", protect, authController.getMe);
 router.post("/2fa/setup", protect, authController.setup2FA);
-router.post("/2fa/verify-setup", protect, validateBody(verify2FASchema), authController.verify2FA);
+router.post(
+    "/2fa/verify-setup",
+    protect,
+    validateBody(verify2FASetupSchema),
+    authController.verify2FASetup,
+);
+router.post("/2fa/verify", validateBody(verify2FASchema), authController.verify2FA);
 
 export default router;

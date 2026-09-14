@@ -21,6 +21,8 @@ const envSchema = z.object({
     JWT_ACCESS_EXPIRY: z.custom<ms.StringValue>(),
     JWT_REFRESH_SECRET: z.string(),
     JWT_REFRESH_EXPIRY: z.custom<ms.StringValue>(),
+    JWT_2FA_SECRET: z.string(),
+    JWT_2FA_EXPIRY: z.custom<ms.StringValue>(),
     SMTP_HOST: z.string(),
     SMTP_PORT: z.coerce.number().int().positive().default(587),
     SMTP_USER: z.string(),

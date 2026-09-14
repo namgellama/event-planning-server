@@ -51,8 +51,14 @@ export const setup2FA = asyncHandler(async (req: Request, res: Response) => {
     sendResponse(res, { qrCode }, "2FA setup initiated successfully");
 });
 
-export const verify2FA = asyncHandler(async (req: Request, res: Response) => {
-    await authService.verify2FA(req.body, req.user.id);
+export const verify2FASetup = asyncHandler(async (req: Request, res: Response) => {
+    await authService.verify2FASetup(req.body, req.user.id);
 
     sendResponse(res, null, "2FA enabled successfully");
+});
+
+export const verify2FA = asyncHandler(async (req: Request, res: Response) => {
+    const data = await authService.verify2FA(req.body, res);
+
+    sendResponse(res, data, "2FA verified successfully");
 });
