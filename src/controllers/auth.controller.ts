@@ -22,9 +22,15 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 });
 
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
-    const tokens = await authService.login(res, req.body);
+    const data = await authService.login(res, req.body);
 
-    sendResponse(res, tokens, "User logged in successfully");
+    sendResponse(
+        res,
+        data,
+        data.requires2FA
+            ? "Authenticate using your authenticator app"
+            : "User logged in successfully",
+    );
 });
 
 export const logoutUser = asyncHandler(async (_req: Request, res: Response) => {

@@ -198,13 +198,17 @@ export async function setup2FA(userId: string): Promise<{ qrCode: string }> {
         throw new AppError(409, "Two factor already enabled");
     }
 
-    const secret = createTotpSecret();
+    let secret = user.twoFactorSecret;
+
+    if (!secret) {
+        secret = createTotpSecret();
+
+        await userRepository.saveTwoFactorSecret(userId, secret);
+    }
 
     const uri = createTotpUri(secret, user.email);
 
     const qrCode = await QRCode.toDataURL(uri);
-
-    await userRepository.saveTwoFactorSecret(userId, secret);
 
     return { qrCode };
 }
