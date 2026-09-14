@@ -6,13 +6,13 @@ import {
     loginUserSchema,
     registerUserSchema,
     sendOtpSchema,
-    verifyOtpSchema,
+    verifyEmailSchema,
 } from "../validations/auth.validation.js";
 
 const router = Router();
 
 router.post("/register/send-otp", validateBody(sendOtpSchema), authController.sendOtp);
-router.post("/register/verify-otp", validateBody(verifyOtpSchema), authController.verifyOtp);
+router.post("/register/verify-email", validateBody(verifyEmailSchema), authController.verifyEmail);
 router.post("/register", validateBody(registerUserSchema), authController.registerUser);
 router.post("/login", validateBody(loginUserSchema), authController.loginUser);
 router.post("/logout", authController.logoutUser);

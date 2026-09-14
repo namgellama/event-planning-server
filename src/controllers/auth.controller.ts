@@ -9,10 +9,10 @@ export const sendOtp = asyncHandler(async (req: Request, res: Response) => {
     sendResponse(res, null, "Otp has been sent to your email");
 });
 
-export const verifyOtp = asyncHandler(async (req: Request, res: Response) => {
-    await authService.verifyOtp(req.body);
+export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
+    await authService.verifyEmail(req.body);
 
-    sendResponse(res, null, "Otp verified successfully");
+    sendResponse(res, null, "Email verified successfully");
 });
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {

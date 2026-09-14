@@ -5,7 +5,7 @@ import {
     refreshTokenResponseSchema,
     registerUserSchema,
     sendOtpSchema,
-    verifyOtpSchema,
+    verifyEmailSchema,
 } from "../validations/auth.validation.js";
 import {
     errorResponseSchema,
@@ -65,26 +65,26 @@ registry.registerPath({
 // Verify OTP
 registry.registerPath({
     method: "post",
-    path: "/auth/register/verify-otp",
-    summary: "Verify OTP for registration",
+    path: "/auth/register/verify-email",
+    summary: "Verify email for registration",
     description:
-        "Verifies the OTP against the hashed value stored in Redis. On success, deletes the OTP and marks the email as verified for 10 minutes.",
+        "Verifies the email using otp against the hashed value stored in Redis. On success, deletes the OTP and marks the email as verified for 10 minutes.",
     tags: ["Auth"],
     request: {
         body: {
             content: {
                 "application/json": {
-                    schema: verifyOtpSchema,
+                    schema: verifyEmailSchema,
                 },
             },
         },
     },
     responses: {
         200: {
-            description: "OTP verified successfully",
+            description: "Email verified successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema("Otp verified successfully", nullDataSchema),
+                    schema: successResponseSchema("Email verified successfully", nullDataSchema),
                 },
             },
         },
