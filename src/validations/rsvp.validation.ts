@@ -1,5 +1,7 @@
 import z from "zod";
 import "../config/zod-extend.js";
+import { sortOrderSchema } from "./query.validation.js";
+import { paginatedResponseSchema, paginationSchema } from "./request-response.validation.js";
 
 export const rsvpInputShape = z.object({
     status: z.enum(["yes", "no", "maybe"]),
@@ -24,3 +26,38 @@ export const rsvpSchema = z
         updatedAt: z.iso.datetime(),
     })
     .openapi("Rsvp");
+
+export const rsvpQuerySchema = paginationSchema
+    .extend({
+        status: z.enum(["yes", "no", "maybe"]).optional().openapi({
+            description: "Filter by rsvp status",
+        }),
+        search: z.string().trim().optional(),
+        sortBy: z.enum(["createdAt", "updatedAt"]).optional().default("createdAt"),
+        ...sortOrderSchema.shape,
+    })
+    .openapi("EventQuery");
+
+export type RsvpQuery = z.infer<typeof rsvpQuerySchema>;
+
+const rsvpUserSchema = z
+    .object({
+        id: z.uuid(),
+        name: z.string(),
+        email: z.email(),
+    })
+    .openapi("RsvpUser");
+
+const rsvpListItemSchema = z
+    .object({
+        eventId: z.uuid(),
+        userId: z.uuid(),
+        status: z.enum(["yes", "no", "maybe"]),
+        createdAt: z.iso.datetime(),
+        updatedAt: z.iso.datetime(),
+        user: rsvpUserSchema,
+    })
+    .openapi("RsvpListItem");
+
+export const paginatedRsvpsSchema =
+    paginatedResponseSchema(rsvpListItemSchema).openapi("PaginatedRsvps");

@@ -18,10 +18,8 @@ export const errorResponseSchema = (message: string) =>
 export const nullDataSchema = z.unknown().nullable().openapi({ example: null });
 
 export const paginationSchema = z.object({
-    page: z.number().openapi({ example: 1 }),
-    limit: z.number().openapi({ example: 10 }),
-    total: z.number().openapi({ example: 42 }),
-    totalPages: z.number().openapi({ example: 5 }),
+    page: z.number().default(1).openapi({ example: 1 }),
+    limit: z.number().default(10).openapi({ example: 10 }),
 });
 
 export const paginatedResponseSchema = <T extends z.ZodType>(itemSchema: T) =>
