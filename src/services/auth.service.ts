@@ -1,20 +1,23 @@
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 import ms from "ms";
+import QRCode from "qrcode";
 import { env } from "../config/env.js";
+import { redis } from "../config/redis.js";
 import { AppError } from "../errors/app-error.js";
 import * as userRepository from "../repositories/user.repository.js";
 import type { User } from "../types/user.js";
 import { signToken, verifyToken } from "../utils/jwt.js";
+import { generateOtp, hashOtp } from "../utils/otp.js";
+import { createTotpSecret, createTotpUri, verifyTotp } from "../utils/totp.js";
 import type {
     LoginUserInput,
     RegisterUserInput,
     SendOtpInput,
+    Verify2FAInput,
     VerifyEmailInput,
 } from "../validations/auth.validation.js";
 import * as emailService from "./email.service.js";
-import { generateOtp, hashOtp } from "../utils/otp.js";
-import { redis } from "../config/redis.js";
 
 const registerOtpKey = (email: string) => `register-otp:${email}`;
 
@@ -157,14 +160,62 @@ export async function refreshToken(req: Request): Promise<string> {
     );
 }
 
-export async function getMe(userId: string): Promise<Omit<User, "password">> {
+export async function getMe(
+    userId: string,
+): Promise<Omit<User, "password" | "twoFactorSecret" | "twoFactorBackupCodes">> {
     const user = await userRepository.findById(userId);
 
     if (!user) {
         throw new AppError(404, "User not found");
     }
 
-    const { password, ...rest } = user;
+    const { password, twoFactorSecret, twoFactorBackupCodes, ...rest } = user;
 
     return rest;
+}
+
+export async function setup2FA(userId: string): Promise<{ qrCode: string }> {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
+    if (user.twoFactorEnabled) {
+        throw new AppError(409, "Two factor already enabled");
+    }
+
+    const secret = createTotpSecret();
+
+    const uri = createTotpUri(secret, user.email);
+
+    const qrCode = await QRCode.toDataURL(uri);
+
+    await userRepository.saveTwoFactorSecret(userId, secret);
+
+    return { qrCode };
+}
+
+export async function verify2FA(body: Verify2FAInput, userId: string): Promise<void> {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
+    if (user.twoFactorEnabled) {
+        throw new AppError(400, "2FA is already enabled");
+    }
+
+    if (!user.twoFactorSecret) {
+        throw new AppError(400, "2FA setup has not been started");
+    }
+
+    const isValid = await verifyTotp(body.code, user.twoFactorSecret);
+
+    if (!isValid) {
+        throw new AppError(400, "Invalid authentication code");
+    }
+
+    await userRepository.enableTwoFactor(userId);
 }

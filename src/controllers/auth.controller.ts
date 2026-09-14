@@ -44,3 +44,15 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
 
     sendResponse(res, user, "Current user fetched successfully");
 });
+
+export const setup2FA = asyncHandler(async (req: Request, res: Response) => {
+    const { qrCode } = await authService.setup2FA(req.user.id);
+
+    sendResponse(res, { qrCode }, "2FA setup initiated successfully");
+});
+
+export const verify2FA = asyncHandler(async (req: Request, res: Response) => {
+    await authService.verify2FA(req.body, req.user.id);
+
+    sendResponse(res, null, "2FA enabled successfully");
+});
