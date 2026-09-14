@@ -1,7 +1,7 @@
 import z from "zod";
 import "../config/zod-extend.js";
-import { sortOrderSchema } from "./query.validation.js";
-import { paginatedResponseSchema, paginationSchema } from "./request-response.validation.js";
+import { paginationSchema, sortOrderSchema } from "./query.validation.js";
+import { paginatedResponseSchema } from "./request-response.validation.js";
 
 export const rsvpInputShape = z.object({
     status: z.enum(["yes", "no", "maybe"]),
@@ -36,7 +36,7 @@ export const rsvpQuerySchema = paginationSchema
         sortBy: z.enum(["createdAt", "updatedAt"]).optional().default("createdAt"),
         ...sortOrderSchema.shape,
     })
-    .openapi("EventQuery");
+    .openapi("RsvpQuery");
 
 export type RsvpQuery = z.infer<typeof rsvpQuerySchema>;
 
