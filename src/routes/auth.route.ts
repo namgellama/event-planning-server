@@ -3,6 +3,7 @@ import * as authController from "../controllers/auth.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 import { validateBody } from "../middlewares/validate-body.middleware.js";
 import {
+    disable2FASchema,
     loginUserSchema,
     registerUserSchema,
     sendOtpSchema,
@@ -28,5 +29,6 @@ router.post(
     authController.verify2FASetup,
 );
 router.post("/2fa/verify", validateBody(verify2FASchema), authController.verify2FA);
+router.post("/2fa/disable", protect, validateBody(disable2FASchema), authController.disable2FA);
 
 export default router;

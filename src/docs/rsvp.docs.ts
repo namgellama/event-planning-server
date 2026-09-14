@@ -4,7 +4,90 @@ import {
     idParamRequestSchema,
     successResponseSchema,
 } from "../validations/request-response.validation.js";
-import { createRsvpSchema, rsvpSchema, updateRsvpSchema } from "../validations/rsvp.validation.js";
+import {
+    createRsvpSchema,
+    paginatedRsvpsSchema,
+    rsvpQuerySchema,
+    rsvpSchema,
+    updateRsvpSchema,
+} from "../validations/rsvp.validation.js";
+
+// Get all rsvps of an event
+registry.registerPath({
+    method: "get",
+    path: "/events/{id}/rsvps",
+    tags: ["RSVP"],
+    summary: "Get event RSVPs",
+    description:
+        "Returns a paginated list of RSVPs for a specific event. Supports filtering by RSVP status, searching by user name or email, and sorting by creation or update time.",
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
+    request: {
+        params: idParamRequestSchema("Event ID"),
+        query: rsvpQuerySchema,
+    },
+    responses: {
+        200: {
+            description: "RSVPs fetched successfully",
+            content: {
+                "application/json": {
+                    schema: successResponseSchema(
+                        "All rsvps fetched successfully",
+                        paginatedRsvpsSchema,
+                    ),
+                },
+            },
+        },
+
+        400: {
+            description: "Invalid query parameters",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Invalid query parameters"),
+                },
+            },
+        },
+
+        401: {
+            description: "Unauthenticated",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Not authenticated"),
+                },
+            },
+        },
+
+        403: {
+            description: "Forbidden - admin access required",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Forbiden - admin access required"),
+                },
+            },
+        },
+
+        404: {
+            description: "Event not found",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Event not found"),
+                },
+            },
+        },
+
+        500: {
+            description: "Internal server error",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Internal server error"),
+                },
+            },
+        },
+    },
+});
 
 // Get my rsvp
 registry.registerPath({

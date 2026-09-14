@@ -1,6 +1,7 @@
 import z from "zod";
 import { registry } from "../config/swagger.js";
 import {
+    disable2FASchema,
     loginResponseSchema,
     loginUserSchema,
     refreshTokenResponseSchema,
@@ -574,6 +575,85 @@ registry.registerPath({
             content: {
                 "application/json": {
                     schema: errorResponseSchema("User not found"),
+                },
+            },
+        },
+
+        500: {
+            description: "Internal server error",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Internal server error"),
+                },
+            },
+        },
+    },
+});
+
+// Disable 2FA
+registry.registerPath({
+    method: "post",
+    path: "/auth/2fa/disable",
+    tags: ["Auth"],
+    summary: "Disable two-factor authentication",
+    description:
+        "Disables two-factor authentication for the authenticated user. The user must provide a valid 6-digit code from their authenticator app.",
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
+    request: {
+        body: {
+            content: {
+                "application/json": {
+                    schema: disable2FASchema,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: "Two-factor authentication disabled successfully",
+            content: {
+                "application/json": {
+                    schema: successResponseSchema("2FA disabled successfully", nullDataSchema),
+                },
+            },
+        },
+
+        400: {
+            description: "Invalid request body",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Invalid request body"),
+                },
+            },
+        },
+
+        401: {
+            description: "Unauthorized or invalid two-factor authentication code",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Unauthorized or invalid 2FA code"),
+                },
+            },
+        },
+
+        404: {
+            description: "User not found",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("User not found"),
+                },
+            },
+        },
+
+        409: {
+            description: "Two-factor authentication is already disabled",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("2FA already disabled"),
                 },
             },
         },

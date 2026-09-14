@@ -63,6 +63,12 @@ export const verify2FASetup = asyncHandler(async (req: Request, res: Response) =
     sendResponse(res, null, "2FA enabled successfully");
 });
 
+export const disable2FA = asyncHandler(async (req: Request, res: Response) => {
+    await authService.disable2FA(req.body, req.user.id);
+
+    sendResponse(res, null, "2FA disabled successfully");
+});
+
 export const verify2FA = asyncHandler(async (req: Request, res: Response) => {
     const data = await authService.verify2FA(req.body, res);
 

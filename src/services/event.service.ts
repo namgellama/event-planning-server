@@ -17,10 +17,7 @@ export async function getAll(
     const { page, limit } = query;
 
     const { events, total } = await eventRespository.findAll(
-        {
-            ...query,
-            tags: query.tags,
-        },
+        query,
         user.role === "user" ? user.id : undefined,
     );
 
