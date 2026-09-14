@@ -1,20 +1,24 @@
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 import ms from "ms";
+import QRCode from "qrcode";
 import { env } from "../config/env.js";
+import { redis } from "../config/redis.js";
 import { AppError } from "../errors/app-error.js";
 import * as userRepository from "../repositories/user.repository.js";
 import type { User } from "../types/user.js";
-import { signToken, verifyToken } from "../utils/jwt.js";
+import { generate2FAToken, signToken, verify2FAToken, verifyToken } from "../utils/jwt.js";
+import { generateOtp, hashOtp } from "../utils/otp.js";
+import { createTotpSecret, createTotpUri, verifyTotp } from "../utils/totp.js";
 import type {
     LoginUserInput,
     RegisterUserInput,
     SendOtpInput,
+    Verify2FAInput,
+    Verify2FASetupInput,
     VerifyEmailInput,
 } from "../validations/auth.validation.js";
 import * as emailService from "./email.service.js";
-import { generateOtp, hashOtp } from "../utils/otp.js";
-import { redis } from "../config/redis.js";
 
 const registerOtpKey = (email: string) => `register-otp:${email}`;
 
@@ -97,7 +101,10 @@ export async function register(body: RegisterUserInput): Promise<Omit<User, "pas
 export async function login(
     res: Response,
     body: LoginUserInput,
-): Promise<{ accessToken: string; refreshToken: string }> {
+): Promise<
+    | { requires2FA: boolean; twoFactorToken: string }
+    | { requires2FA: boolean; accessToken: string; refreshToken: string }
+> {
     const user = await userRepository.findByEmail(body.email);
 
     if (!user) {
@@ -110,13 +117,22 @@ export async function login(
         throw new AppError(401, "Invalid credentials");
     }
 
+    if (user.twoFactorEnabled) {
+        const twoFactorToken = generate2FAToken(user.id);
+
+        return {
+            requires2FA: true,
+            twoFactorToken: twoFactorToken,
+        };
+    }
+
     const accessToken = signToken(
-        { sub: user.id, role: user.role },
+        { sub: user.id, role: user.role, type: "access" },
         env.JWT_ACCESS_SECRET,
         env.JWT_ACCESS_EXPIRY,
     );
     const refreshToken = signToken(
-        { sub: user.id, role: user.role },
+        { sub: user.id, role: user.role, type: "refresh" },
         env.JWT_REFRESH_SECRET,
         env.JWT_REFRESH_EXPIRY,
     );
@@ -128,7 +144,7 @@ export async function login(
         maxAge: ms(env.JWT_REFRESH_EXPIRY as ms.StringValue),
     });
 
-    return { accessToken, refreshToken };
+    return { requires2FA: false, accessToken, refreshToken };
 }
 
 export async function logout(res: Response): Promise<void> {
@@ -151,20 +167,115 @@ export async function refreshToken(req: Request): Promise<string> {
     }
 
     return signToken(
-        { sub: user.id, role: user.role },
+        { sub: user.id, role: user.role, type: "access" },
         env.JWT_ACCESS_SECRET,
         env.JWT_ACCESS_EXPIRY,
     );
 }
 
-export async function getMe(userId: string): Promise<Omit<User, "password">> {
+export async function getMe(
+    userId: string,
+): Promise<Omit<User, "password" | "twoFactorSecret" | "twoFactorBackupCodes">> {
     const user = await userRepository.findById(userId);
 
     if (!user) {
         throw new AppError(404, "User not found");
     }
 
-    const { password, ...rest } = user;
+    const { password, twoFactorSecret, twoFactorBackupCodes, ...rest } = user;
 
     return rest;
+}
+
+export async function setup2FA(userId: string): Promise<{ qrCode: string }> {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
+    if (user.twoFactorEnabled) {
+        throw new AppError(409, "Two factor already enabled");
+    }
+
+    let secret = user.twoFactorSecret;
+
+    if (!secret) {
+        secret = createTotpSecret();
+
+        await userRepository.saveTwoFactorSecret(userId, secret);
+    }
+
+    const uri = createTotpUri(secret, user.email);
+
+    const qrCode = await QRCode.toDataURL(uri);
+
+    return { qrCode };
+}
+
+export async function verify2FASetup(body: Verify2FASetupInput, userId: string): Promise<void> {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
+    if (user.twoFactorEnabled) {
+        throw new AppError(400, "2FA is already enabled");
+    }
+
+    if (!user.twoFactorSecret) {
+        throw new AppError(400, "2FA setup has not been started");
+    }
+
+    const isValid = await verifyTotp(body.code, user.twoFactorSecret);
+
+    if (!isValid) {
+        throw new AppError(400, "Invalid authentication code");
+    }
+
+    await userRepository.enableTwoFactor(userId);
+}
+
+export async function verify2FA(
+    body: Verify2FAInput,
+    res: Response,
+): Promise<{ requiresTwoFactor: boolean; accessToken: string; refreshToken: string }> {
+    const payload = verify2FAToken(body.twoFactorToken);
+
+    const user = await userRepository.findById(payload.sub);
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
+    if (!user.twoFactorEnabled || !user.twoFactorSecret) {
+        throw new AppError(400, "2FA is not enabled");
+    }
+
+    const isValid = await verifyTotp(body.code, user.twoFactorSecret);
+
+    if (!isValid) {
+        throw new AppError(401, "Invalid authentication code");
+    }
+
+    const accessToken = signToken(
+        { sub: user.id, role: user.role, type: "access" },
+        env.JWT_ACCESS_SECRET,
+        env.JWT_ACCESS_EXPIRY,
+    );
+    const refreshToken = signToken(
+        { sub: user.id, role: user.role, type: "refresh" },
+        env.JWT_REFRESH_SECRET,
+        env.JWT_REFRESH_EXPIRY,
+    );
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: ms(env.JWT_REFRESH_EXPIRY as ms.StringValue),
+    });
+
+    return { requiresTwoFactor: false, accessToken, refreshToken };
 }

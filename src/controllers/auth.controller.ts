@@ -22,9 +22,15 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 });
 
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
-    const tokens = await authService.login(res, req.body);
+    const data = await authService.login(res, req.body);
 
-    sendResponse(res, tokens, "User logged in successfully");
+    sendResponse(
+        res,
+        data,
+        data.requires2FA
+            ? "Authenticate using your authenticator app"
+            : "User logged in successfully",
+    );
 });
 
 export const logoutUser = asyncHandler(async (_req: Request, res: Response) => {
@@ -43,4 +49,22 @@ export const getMe = asyncHandler(async (req: Request, res: Response) => {
     const user = await authService.getMe(req.user.id);
 
     sendResponse(res, user, "Current user fetched successfully");
+});
+
+export const setup2FA = asyncHandler(async (req: Request, res: Response) => {
+    const { qrCode } = await authService.setup2FA(req.user.id);
+
+    sendResponse(res, { qrCode }, "2FA setup initiated successfully");
+});
+
+export const verify2FASetup = asyncHandler(async (req: Request, res: Response) => {
+    await authService.verify2FASetup(req.body, req.user.id);
+
+    sendResponse(res, null, "2FA enabled successfully");
+});
+
+export const verify2FA = asyncHandler(async (req: Request, res: Response) => {
+    const data = await authService.verify2FA(req.body, res);
+
+    sendResponse(res, data, "2FA verified successfully");
 });

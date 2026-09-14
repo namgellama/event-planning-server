@@ -1,3 +1,4 @@
+import z from "zod";
 import { registry } from "../config/swagger.js";
 import {
     loginResponseSchema,
@@ -5,6 +6,7 @@ import {
     refreshTokenResponseSchema,
     registerUserSchema,
     sendOtpSchema,
+    verify2FASchema,
     verifyEmailSchema,
 } from "../validations/auth.validation.js";
 import {
@@ -358,6 +360,224 @@ registry.registerPath({
                 },
             },
         },
+        500: {
+            description: "Internal server error",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Internal server error"),
+                },
+            },
+        },
+    },
+});
+
+// 2FA setup
+registry.registerPath({
+    method: "post",
+    path: "/auth/2fa/setup",
+    summary: "Setup 2FA",
+    description:
+        "Generates a TOTP secret and QR code for the currently authenticated user to configure two-factor authentication.",
+    tags: ["Auth"],
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
+    responses: {
+        200: {
+            description: "2FA setup initiated successfully",
+            content: {
+                "application/json": {
+                    schema: successResponseSchema(
+                        "2FA setup initiated successfully",
+                        z.object({
+                            qrCode: z.string().openapi({
+                                example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+                                description:
+                                    "Base64-encoded QR code containing the TOTP setup URI.",
+                            }),
+                        }),
+                    ),
+                },
+            },
+        },
+        401: {
+            description: "Unauthorized — missing or invalid access token",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Unauthorized"),
+                },
+            },
+        },
+
+        404: {
+            description: "User not found",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("User not found"),
+                },
+            },
+        },
+
+        409: {
+            description: "Two-factor authentication is already enabled",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Two factor already enabled"),
+                },
+            },
+        },
+
+        500: {
+            description: "Internal server error",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Internal server error"),
+                },
+            },
+        },
+    },
+});
+
+// Verify 2FA setup
+registry.registerPath({
+    method: "post",
+    path: "/auth/2fa/verify-setup",
+    summary: "Verify 2FA setup",
+    description:
+        "Verifies the authenticator code and enables two-factor authentication for the currently logged-in user.",
+    tags: ["Auth"],
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
+    request: {
+        body: {
+            content: {
+                "application/json": {
+                    schema: verify2FASchema,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: "2FA enabled successfully",
+            content: {
+                "application/json": {
+                    schema: successResponseSchema("2FA enabled successfully", nullDataSchema),
+                },
+            },
+        },
+        400: {
+            description:
+                "Invalid 2FA request — setup has not been started, 2FA is already enabled, or the authentication code is invalid.",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Invalid authentication code"),
+                },
+            },
+        },
+        401: {
+            description: "Unauthorized — missing or invalid access token",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Unauthorized"),
+                },
+            },
+        },
+
+        404: {
+            description: "User not found",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("User not found"),
+                },
+            },
+        },
+        500: {
+            description: "Internal server error",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Internal server error"),
+                },
+            },
+        },
+    },
+});
+
+// Verify 2FA
+registry.registerPath({
+    method: "post",
+    path: "/auth/2fa/verify",
+    summary: "Verify 2FA",
+    description:
+        "Verifies the authenticator code using the temporary 2FA token issued during login and returns access and refresh tokens.",
+    tags: ["Auth"],
+    request: {
+        body: {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: verify2FASchema,
+                },
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: "2FA verified successfully",
+            content: {
+                "application/json": {
+                    schema: successResponseSchema(
+                        "2FA verified successfully",
+                        z.object({
+                            requiresTwoFactor: z.boolean().openapi({
+                                example: false,
+                            }),
+                            accessToken: z.string().openapi({
+                                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                description: "JWT access token used to authenticate API requests.",
+                            }),
+                            refreshToken: z.string().openapi({
+                                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                description: "JWT refresh token used to obtain a new access token.",
+                            }),
+                        }),
+                    ),
+                },
+            },
+        },
+
+        400: {
+            description: "2FA is not enabled or the 2FA request is invalid",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("2FA is not enabled"),
+                },
+            },
+        },
+
+        401: {
+            description: "Invalid or expired 2FA token, or invalid authentication code",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("Invalid authentication code"),
+                },
+            },
+        },
+
+        404: {
+            description: "User not found",
+            content: {
+                "application/json": {
+                    schema: errorResponseSchema("User not found"),
+                },
+            },
+        },
+
         500: {
             description: "Internal server error",
             content: {

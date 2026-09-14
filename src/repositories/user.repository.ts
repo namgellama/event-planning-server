@@ -16,3 +16,15 @@ export async function create(body: RegisterUserInput): Promise<Omit<User, "passw
 
     return rest;
 }
+
+export async function saveTwoFactorSecret(userId: string, secret: string): Promise<number> {
+    return await db<User>("users").where({ id: userId }).update({
+        twoFactorSecret: secret,
+    });
+}
+
+export async function enableTwoFactor(userId: string): Promise<number> {
+    return await db<User>("users").where({ id: userId }).update({
+        twoFactorEnabled: true,
+    });
+}
