@@ -10,7 +10,7 @@ import type {
     LoginUserInput,
     RegisterUserInput,
     SendOtpInput,
-    VerifyOtpInput,
+    VerifyEmailInput,
 } from "../validations/auth.validation.js";
 import * as emailService from "./email.service.js";
 import { generateOtp, hashOtp } from "../utils/otp.js";
@@ -21,6 +21,12 @@ const registerOtpKey = (email: string) => `register-otp:${email}`;
 const registerVerifiedKey = (email: string) => `register-verified:${email}`;
 
 export async function sendOtp(body: SendOtpInput): Promise<void> {
+    const user = await userRepository.findByEmail(body.email);
+
+    if (user) {
+        throw new AppError(409, "Email already exists");
+    }
+
     const otpKey = registerOtpKey(body.email);
     const verifiedKey = registerVerifiedKey(body.email);
 
@@ -44,7 +50,7 @@ export async function sendOtp(body: SendOtpInput): Promise<void> {
     });
 }
 
-export async function verifyOtp(body: VerifyOtpInput): Promise<void> {
+export async function verifyEmail(body: VerifyEmailInput): Promise<void> {
     const otpKey = registerOtpKey(body.email);
     const verifiedKey = registerVerifiedKey(body.email);
 

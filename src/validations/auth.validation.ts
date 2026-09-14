@@ -9,7 +9,7 @@ export const sendOtpSchema = z
 
 export type SendOtpInput = z.infer<typeof sendOtpSchema>;
 
-export const verifyOtpSchema = z
+export const verifyEmailSchema = z
     .object({
         email: z.email().trim().openapi({ example: "jane@example.com" }),
         otp: z
@@ -17,9 +17,9 @@ export const verifyOtpSchema = z
             .regex(/^\d{6}$/, "OTP must be 6 digits")
             .openapi({ example: "123456" }),
     })
-    .openapi("VerifyOtpInput");
+    .openapi("VerifyEmailInput");
 
-export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
 
 export const registerUserSchema = z
     .object({
