@@ -28,3 +28,11 @@ export async function enableTwoFactor(userId: string): Promise<number> {
         twoFactorEnabled: true,
     });
 }
+
+export async function disableTwoFactor(userId: string): Promise<number> {
+    return await db<User>("users").where({ id: userId }).update({
+        twoFactorEnabled: false,
+        twoFactorSecret: null,
+        twoFactorBackupCodes: null,
+    });
+}

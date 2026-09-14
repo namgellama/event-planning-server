@@ -11,6 +11,7 @@ import { generate2FAToken, signToken, verify2FAToken, verifyToken } from "../uti
 import { generateOtp, hashOtp } from "../utils/otp.js";
 import { createTotpSecret, createTotpUri, verifyTotp } from "../utils/totp.js";
 import type {
+    Disable2FAInput,
     LoginUserInput,
     RegisterUserInput,
     SendOtpInput,
@@ -278,4 +279,24 @@ export async function verify2FA(
     });
 
     return { requiresTwoFactor: false, accessToken, refreshToken };
+}
+
+export async function disable2FA(body: Disable2FAInput, userId: string): Promise<void> {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
+    if (!user.twoFactorEnabled || !user.twoFactorSecret) {
+        throw new AppError(409, "Two factor already disabled");
+    }
+
+    const isValid = await verifyTotp(body.code, user.twoFactorSecret);
+
+    if (!isValid) {
+        throw new AppError(401, "Invalid authentication code");
+    }
+
+    await userRepository.disableTwoFactor(userId);
 }
