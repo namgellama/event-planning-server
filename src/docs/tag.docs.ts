@@ -1,8 +1,13 @@
 import { registry } from "@/config/swagger.js";
 import {
+    adminErrorResponseSchema,
+    authErrorResponseSchema,
     errorResponseSchema,
     idParamRequestSchema,
+    internalServerErrorResponseSchema,
+    invalidQueryErrorResponseSchema,
     successResponseSchema,
+    validationErrorResponseSchema,
 } from "@/validations/request-response.validation.js";
 import {
     createTagSchema,
@@ -39,15 +44,15 @@ registry.registerPath({
             description: "Invalid query parameters",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Invalid request query"),
+                    schema: invalidQueryErrorResponseSchema,
                 },
             },
         },
         401: {
-            description: "Unauthorized",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
@@ -55,7 +60,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -83,10 +88,10 @@ registry.registerPath({
             },
         },
         401: {
-            description: "Unauthorized",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
@@ -102,7 +107,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -139,23 +144,23 @@ registry.registerPath({
             description: "Validation error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Title is required"),
+                    schema: validationErrorResponseSchema,
                 },
             },
         },
         401: {
-            description: "Unauthorized",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
         403: {
-            description: "Forbidden — admin only",
+            description: "Not authorized - need admin access",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Forbidden"),
+                    schema: adminErrorResponseSchema,
                 },
             },
         },
@@ -163,7 +168,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -201,23 +206,23 @@ registry.registerPath({
             description: "Validation error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Invalid request body"),
+                    schema: validationErrorResponseSchema,
                 },
             },
         },
         401: {
-            description: "Unauthorized",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
         403: {
-            description: "Forbidden — admin only",
+            description: "Not authorized - need admin access",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Forbidden"),
+                    schema: adminErrorResponseSchema,
                 },
             },
         },
@@ -233,7 +238,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -257,18 +262,18 @@ registry.registerPath({
             description: "Tag deleted successfully — no response body",
         },
         401: {
-            description: "Unauthorized",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
         403: {
-            description: "Forbidden — admin only",
+            description: "Not authorized - need admin access",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Forbidden"),
+                    schema: adminErrorResponseSchema,
                 },
             },
         },
@@ -284,7 +289,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },

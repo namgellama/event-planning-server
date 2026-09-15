@@ -1,5 +1,3 @@
-import z from "zod";
-
 import { registry } from "@/config/swagger.js";
 import {
     disable2FASchema,
@@ -8,13 +6,17 @@ import {
     refreshTokenResponseSchema,
     registerUserSchema,
     sendOtpSchema,
+    setup2FAResponseSchema,
     verify2FASchema,
     verifyEmailSchema,
 } from "@/validations/auth.validation.js";
 import {
+    authErrorResponseSchema,
     errorResponseSchema,
+    internalServerErrorResponseSchema,
     nullDataSchema,
     successResponseSchema,
+    validationErrorResponseSchema,
 } from "@/validations/request-response.validation.js";
 import { userResponseSchema } from "@/validations/user.validation.js";
 
@@ -51,7 +53,7 @@ registry.registerPath({
             description: "Validation error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Invalid request body"),
+                    schema: validationErrorResponseSchema,
                 },
             },
         },
@@ -59,7 +61,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -112,7 +114,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -168,7 +170,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -217,7 +219,7 @@ registry.registerPath({
             description: "Validation error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Validation error"),
+                    schema: validationErrorResponseSchema,
                 },
             },
         },
@@ -233,7 +235,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -269,7 +271,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -319,7 +321,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -347,10 +349,10 @@ registry.registerPath({
             },
         },
         401: {
-            description: "Unauthorized — missing or invalid access token",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
@@ -366,7 +368,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -393,22 +395,16 @@ registry.registerPath({
                 "application/json": {
                     schema: successResponseSchema(
                         "2FA setup initiated successfully",
-                        z.object({
-                            qrCode: z.string().openapi({
-                                example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
-                                description:
-                                    "Base64-encoded QR code containing the TOTP setup URI.",
-                            }),
-                        }),
+                        setup2FAResponseSchema,
                     ),
                 },
             },
         },
         401: {
-            description: "Unauthorized — missing or invalid access token",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
@@ -435,7 +431,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -483,10 +479,10 @@ registry.registerPath({
             },
         },
         401: {
-            description: "Unauthorized — missing or invalid access token",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
@@ -503,7 +499,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -533,22 +529,7 @@ registry.registerPath({
             description: "2FA verified successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema(
-                        "2FA verified successfully",
-                        z.object({
-                            requiresTwoFactor: z.boolean().openapi({
-                                example: false,
-                            }),
-                            accessToken: z.string().openapi({
-                                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                description: "JWT access token used to authenticate API requests.",
-                            }),
-                            refreshToken: z.string().openapi({
-                                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                                description: "JWT refresh token used to obtain a new access token.",
-                            }),
-                        }),
-                    ),
+                    schema: successResponseSchema("2FA verified successfully", verify2FASchema),
                 },
             },
         },
@@ -584,7 +565,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -624,10 +605,10 @@ registry.registerPath({
         },
 
         400: {
-            description: "Invalid request body",
+            description: "Validation error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Invalid request body"),
+                    schema: validationErrorResponseSchema,
                 },
             },
         },
@@ -663,7 +644,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
