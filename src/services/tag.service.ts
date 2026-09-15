@@ -4,7 +4,7 @@ import type { PaginatedResponse } from "@/types/pagination.js";
 import type { Tag } from "@/types/tag.js";
 import type { CreateTagInput, TagQuery } from "@/validations/tag.validation.js";
 
-export async function getAll(query: TagQuery): Promise<PaginatedResponse<Tag>> {
+export async function getAllTags(query: TagQuery): Promise<PaginatedResponse<Tag>> {
     const { page, limit } = query;
 
     const { tags, total } = await tagRepository.findAll(query);
@@ -20,7 +20,7 @@ export async function getAll(query: TagQuery): Promise<PaginatedResponse<Tag>> {
     };
 }
 
-export async function getById(tagId: string): Promise<Tag> {
+export async function getTagById(tagId: string): Promise<Tag> {
     const tag = await tagRepository.findById(tagId);
 
     if (!tag) {
@@ -30,15 +30,15 @@ export async function getById(tagId: string): Promise<Tag> {
     return tag;
 }
 
-export async function getByIds(tagIds: string[]): Promise<Tag[]> {
+export async function getTagsByIds(tagIds: string[]): Promise<Tag[]> {
     return tagRepository.findByIds(tagIds);
 }
 
-export async function create(body: CreateTagInput, userId: string): Promise<Tag> {
+export async function createTag(body: CreateTagInput, userId: string): Promise<Tag> {
     return tagRepository.create(body, userId);
 }
 
-export async function update(tagId: string, body: CreateTagInput, userId: string): Promise<Tag> {
+export async function updateTag(tagId: string, body: CreateTagInput, userId: string): Promise<Tag> {
     const tag = await tagRepository.update(tagId, body, userId);
 
     if (!tag) {
@@ -47,7 +47,7 @@ export async function update(tagId: string, body: CreateTagInput, userId: string
     return tag;
 }
 
-export async function remove(tagId: string, userId: string): Promise<void> {
+export async function deleteTag(tagId: string, userId: string): Promise<void> {
     const tag = await tagRepository.remove(tagId, userId);
 
     if (tag === 0) {

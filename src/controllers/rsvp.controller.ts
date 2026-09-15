@@ -5,28 +5,48 @@ import * as rsvpService from "@/services/rsvp.service.js";
 import { sendResponse } from "@/utils/response.js";
 import { rsvpQuerySchema } from "@/validations/rsvp.validation.js";
 
-export const fetchAllRsvps = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+/*
+ * @desc Get all RSVPs
+ * @route GET /api/v1/events/:id/rsvps
+ * @access Private/Admin
+ */
+export const getAllRSVPs = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
     const query = rsvpQuerySchema.parse(req.query);
 
-    const rsvp = await rsvpService.getAll(query, req.params.id);
+    const rsvp = await rsvpService.getAllRSVPs(query, req.params.id);
 
-    sendResponse(res, rsvp, "All rsvps fetched successfully");
+    sendResponse(res, rsvp, "All RSVPs fetched successfully");
 });
 
-export const fetchMyRsvp = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    const rsvp = await rsvpService.getByEventAndUser(req.params.id, req.user.id);
+/*
+ * @desc Get my RSVP
+ * @route GET /api/v1/events/:id/rsvps/me
+ * @access Private
+ */
+export const getMyRSVP = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const rsvp = await rsvpService.getRSVPByEventAndUser(req.params.id, req.user.id);
 
-    sendResponse(res, rsvp, "My rsvp fetched successfully");
+    sendResponse(res, rsvp, "My RSVP fetched successfully");
 });
 
-export const createRsvp = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    const rsvp = await rsvpService.create(req.body, req.params.id, req.user.id);
+/*
+ * @desc Create RSVP
+ * @route POST /api/v1/events/:id/rsvps
+ * @access Private
+ */
+export const createRSVP = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const rsvp = await rsvpService.createRSVP(req.body, req.params.id, req.user.id);
 
-    sendResponse(res, rsvp, "Rsvp created successfully", 201);
+    sendResponse(res, rsvp, "RSVP created successfully", 201);
 });
 
-export const updateRsvp = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    const rsvp = await rsvpService.update(req.body, req.params.id, req.user.id);
+/*
+ * @desc Update RSVP
+ * @route PATCH /api/v1/events/:id/rsvps
+ * @access Private
+ */
+export const updateRSVP = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const rsvp = await rsvpService.updateRSVP(req.body, req.params.id, req.user.id);
 
-    sendResponse(res, rsvp, "Rsvp updated successfully");
+    sendResponse(res, rsvp, "RSVP updated successfully");
 });

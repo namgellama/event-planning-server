@@ -1,15 +1,15 @@
 import type { User } from "./user.js";
 
-export type RsvpStatus = "yes" | "no" | "maybe";
+export type RSVPStatus = "yes" | "no" | "maybe";
 
-export type Rsvp = {
+export type RSVP = {
     eventId: string;
     userId: string;
-    status: RsvpStatus;
+    status: RSVPStatus;
     createdAt: Date;
     updatedAt: Date;
 };
 
-export type RsvpListItem = Rsvp & {
+export type RSVPListItem = RSVP & {
     user: Pick<User, "id" | "name" | "email">;
 };

@@ -136,7 +136,7 @@ export async function findById(eventId: string): Promise<Event | undefined> {
     return db<Event>("events").select("*").where("id", eventId).first();
 }
 
-export async function findByIdWithTags(eventId: string): Promise<EventItem | undefined> {
+export async function findByIdWithDetails(eventId: string): Promise<EventItem | undefined> {
     return db<Event>("events")
         .select(
             "events.*",

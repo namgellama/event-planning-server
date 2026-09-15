@@ -8,15 +8,15 @@ export const rsvpInputShape = z.object({
     status: z.enum(["yes", "no", "maybe"]),
 });
 
-export const createRsvpSchema = rsvpInputShape.openapi("CreateRsvpInput");
+export const createRSVPSchema = rsvpInputShape.openapi("CreateRSVPInput");
 
-export type CreateRsvpInput = z.infer<typeof createRsvpSchema>;
+export type CreateRSVPInput = z.infer<typeof createRSVPSchema>;
 
-export const updateRsvpSchema = rsvpInputShape.openapi("UpdateRsvpInput");
+export const updateRSVPSchema = rsvpInputShape.openapi("UpdateRSVPInput");
 
-export type UpdateRsvpInput = z.infer<typeof updateRsvpSchema>;
+export type UpdateRSVPInput = z.infer<typeof updateRSVPSchema>;
 
-export const rsvpStatusSchema = z.enum(["yes", "no", "maybe"]).openapi("RsvpStatus");
+export const rsvpStatusSchema = z.enum(["yes", "no", "maybe"]).openapi("RSVPStatus");
 
 export const rsvpSchema = z
     .object({
@@ -26,20 +26,20 @@ export const rsvpSchema = z
         createdAt: z.iso.datetime(),
         updatedAt: z.iso.datetime(),
     })
-    .openapi("Rsvp");
+    .openapi("RSVP");
 
 export const rsvpQuerySchema = paginationSchema
     .extend({
         status: z.enum(["yes", "no", "maybe"]).optional().openapi({
-            description: "Filter by rsvp status",
+            description: "Filter by RSVP status",
         }),
         search: z.string().trim().optional(),
         sortBy: z.enum(["createdAt", "updatedAt"]).optional().default("createdAt"),
         ...sortOrderSchema.shape,
     })
-    .openapi("RsvpQuery");
+    .openapi("RSVPQuery");
 
-export type RsvpQuery = z.infer<typeof rsvpQuerySchema>;
+export type RSVPQuery = z.infer<typeof rsvpQuerySchema>;
 
 const rsvpUserSchema = z
     .object({
@@ -47,7 +47,7 @@ const rsvpUserSchema = z
         name: z.string(),
         email: z.email(),
     })
-    .openapi("RsvpUser");
+    .openapi("RSVPUser");
 
 const rsvpListItemSchema = z
     .object({
@@ -58,7 +58,7 @@ const rsvpListItemSchema = z
         updatedAt: z.iso.datetime(),
         user: rsvpUserSchema,
     })
-    .openapi("RsvpListItem");
+    .openapi("RSVPListItem");
 
-export const paginatedRsvpsSchema =
-    paginatedResponseSchema(rsvpListItemSchema).openapi("PaginatedRsvps");
+export const paginatedRSVPSchema =
+    paginatedResponseSchema(rsvpListItemSchema).openapi("PaginatedRSVP");

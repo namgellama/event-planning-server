@@ -23,7 +23,6 @@ import type {
 import * as emailService from "./email.service.js";
 
 const registerOtpKey = (email: string) => `register-otp:${email}`;
-
 const registerVerifiedKey = (email: string) => `register-verified:${email}`;
 
 export async function sendOtp(body: SendOtpInput): Promise<void> {

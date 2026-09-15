@@ -5,11 +5,11 @@ import {
     successResponseSchema,
 } from "@/validations/request-response.validation.js";
 import {
-    createRsvpSchema,
-    paginatedRsvpsSchema,
+    createRSVPSchema,
+    paginatedRSVPSchema,
     rsvpQuerySchema,
     rsvpSchema,
-    updateRsvpSchema,
+    updateRSVPSchema,
 } from "@/validations/rsvp.validation.js";
 
 // Get all rsvps of an event
@@ -36,7 +36,7 @@ registry.registerPath({
                 "application/json": {
                     schema: successResponseSchema(
                         "All rsvps fetched successfully",
-                        paginatedRsvpsSchema,
+                        paginatedRSVPSchema,
                     ),
                 },
             },
@@ -146,7 +146,7 @@ registry.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: createRsvpSchema,
+                    schema: createRSVPSchema,
                 },
             },
         },
@@ -216,7 +216,7 @@ registry.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: updateRsvpSchema,
+                    schema: updateRSVPSchema,
                 },
             },
         },

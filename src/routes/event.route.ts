@@ -8,7 +8,7 @@ import { createEventSchema, updateEventSchema } from "@/validations/event.valida
 const router = Router();
 
 router.get("/", protect, eventController.getAllEvents);
-router.get("/:id", protect, eventController.getEvent);
+router.get("/:id", protect, eventController.getEventDetails);
 router.post("/", protect, admin, validateBody(createEventSchema), eventController.createEvent);
 router.patch("/:id", protect, admin, validateBody(updateEventSchema), eventController.updateEvent);
 router.delete("/:id", protect, admin, eventController.deleteEvent);

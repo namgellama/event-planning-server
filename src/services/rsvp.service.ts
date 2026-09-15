@@ -2,14 +2,14 @@ import { AppError } from "@/errors/app-error.js";
 import * as rsvpRepository from "@/repositories/rsvp.repository.js";
 import * as eventService from "@/services/event.service.js";
 import type { PaginatedResponse } from "@/types/pagination.js";
-import type { Rsvp, RsvpListItem } from "@/types/rsvp.js";
-import type { CreateRsvpInput, RsvpQuery } from "@/validations/rsvp.validation.js";
+import type { RSVP, RSVPListItem } from "@/types/rsvp.js";
+import type { CreateRSVPInput, RSVPQuery } from "@/validations/rsvp.validation.js";
 
-export async function getAll(
-    query: RsvpQuery,
+export async function getAllRSVPs(
+    query: RSVPQuery,
     eventId: string,
-): Promise<PaginatedResponse<RsvpListItem>> {
-    await eventService.findById(eventId);
+): Promise<PaginatedResponse<RSVPListItem>> {
+    await eventService.getEventById(eventId);
 
     const { page, limit } = query;
 
@@ -26,18 +26,18 @@ export async function getAll(
     };
 }
 
-export async function getByEventAndUser(eventId: string, userId: string): Promise<Rsvp | null> {
+export async function getRSVPByEventAndUser(eventId: string, userId: string): Promise<RSVP | null> {
     const rsvp = await rsvpRepository.findByEventAndUser(eventId, userId);
 
     return rsvp ?? null;
 }
 
-export async function create(
-    body: CreateRsvpInput,
+export async function createRSVP(
+    body: CreateRSVPInput,
     eventId: string,
     userId: string,
-): Promise<Rsvp> {
-    await eventService.findById(eventId);
+): Promise<RSVP> {
+    await eventService.getEventById(eventId);
 
     const rsvp = await rsvpRepository.findByEventAndUser(eventId, userId);
 
@@ -48,15 +48,15 @@ export async function create(
     return rsvpRepository.create(body, eventId, userId);
 }
 
-export async function update(
-    body: CreateRsvpInput,
+export async function updateRSVP(
+    body: CreateRSVPInput,
     eventId: string,
     userId: string,
-): Promise<Rsvp> {
+): Promise<RSVP> {
     const rsvp = await rsvpRepository.update(body, eventId, userId);
 
     if (!rsvp) {
-        throw new AppError(404, "Rsvp not found");
+        throw new AppError(404, "RSVP not found");
     }
 
     return rsvp;

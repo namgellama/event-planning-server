@@ -8,7 +8,7 @@ import { createTagSchema, updateTagSchema } from "@/validations/tag.validation.j
 const router = Router();
 
 router.get("/", protect, tagController.getAllTags);
-router.get("/:id", protect, tagController.getTag);
+router.get("/:id", protect, tagController.getTagDetails);
 router.post("/", protect, admin, validateBody(createTagSchema), tagController.createTag);
 router.patch("/:id", protect, admin, validateBody(updateTagSchema), tagController.updateTag);
 router.delete("/:id", protect, admin, tagController.deleteTag);

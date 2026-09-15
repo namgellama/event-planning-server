@@ -21,7 +21,9 @@ router.post("/register", validateBody(registerUserSchema), authController.regist
 router.post("/login", validateBody(loginUserSchema), authController.loginUser);
 router.post("/logout", authController.logoutUser);
 router.post("/refresh-token", authController.refreshToken);
+
 router.get("/me", protect, authController.getMe);
+
 router.post("/2fa/setup", protect, authController.setup2FA);
 router.post(
     "/2fa/verify-setup",
