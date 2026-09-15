@@ -1,8 +1,8 @@
-import { AppError } from "../errors/app-error.js";
-import * as tagRepository from "../repositories/tag.repository.js";
-import type { PaginatedResponse } from "../types/pagination.js";
-import type { Tag } from "../types/tag.js";
-import type { CreateTagInput, TagQuery } from "../validations/tag.validation.js";
+import { AppError } from "@/errors/app-error.js";
+import * as tagRepository from "@/repositories/tag.repository.js";
+import type { PaginatedResponse } from "@/types/pagination.js";
+import type { Tag } from "@/types/tag.js";
+import type { CreateTagInput, TagQuery } from "@/validations/tag.validation.js";
 
 export async function getAll(query: TagQuery): Promise<PaginatedResponse<Tag>> {
     const { page, limit } = query;

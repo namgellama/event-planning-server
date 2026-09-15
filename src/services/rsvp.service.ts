@@ -1,9 +1,9 @@
-import { AppError } from "../errors/app-error.js";
-import * as rsvpRepository from "../repositories/rsvp.repository.js";
-import * as eventService from "../services/event.service.js";
-import type { PaginatedResponse } from "../types/pagination.js";
-import type { Rsvp, RsvpListItem } from "../types/rsvp.js";
-import type { CreateRsvpInput, RsvpQuery } from "../validations/rsvp.validation.js";
+import { AppError } from "@/errors/app-error.js";
+import * as rsvpRepository from "@/repositories/rsvp.repository.js";
+import * as eventService from "@/services/event.service.js";
+import type { PaginatedResponse } from "@/types/pagination.js";
+import type { Rsvp, RsvpListItem } from "@/types/rsvp.js";
+import type { CreateRsvpInput, RsvpQuery } from "@/validations/rsvp.validation.js";
 
 export async function getAll(
     query: RsvpQuery,

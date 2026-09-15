@@ -1,13 +1,13 @@
-import { AppError } from "../errors/app-error.js";
-import * as eventRespository from "../repositories/event.repository.js";
-import type { Event, EventItem, EventListItem, EventWithTagIds } from "../types/event.js";
-import type { PaginatedResponse } from "../types/pagination.js";
-import type { User } from "../types/user.js";
+import { AppError } from "@/errors/app-error.js";
+import * as eventRespository from "@/repositories/event.repository.js";
+import type { Event, EventItem, EventListItem, EventWithTagIds } from "@/types/event.js";
+import type { PaginatedResponse } from "@/types/pagination.js";
+import type { User } from "@/types/user.js";
 import type {
     CreateEventInput,
     EventQuery,
     UpdateEventInput,
-} from "../validations/event.validation.js";
+} from "@/validations/event.validation.js";
 import * as tagService from "./tag.service.js";
 
 export async function getAll(

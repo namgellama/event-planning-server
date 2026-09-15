@@ -1,6 +1,6 @@
-import { db } from "../db/index.js";
-import type { Tag } from "../types/tag.js";
-import type { CreateTagInput, TagQuery, UpdateTagInput } from "../validations/tag.validation.js";
+import { db } from "@/db/index.js";
+import type { Tag } from "@/types/tag.js";
+import type { CreateTagInput, TagQuery, UpdateTagInput } from "@/validations/tag.validation.js";
 
 export async function findAll(query: TagQuery): Promise<{ tags: Tag[]; total: number }> {
     const { page, limit, search, sortBy, sortOrder } = query;

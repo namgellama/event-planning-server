@@ -1,7 +1,8 @@
 import type { Request, Response } from "express";
-import { asyncHandler } from "../middlewares/async-handler.middleware.js";
-import * as authService from "../services/auth.service.js";
-import { sendResponse } from "../utils/response.js";
+
+import { asyncHandler } from "@/middlewares/async-handler.middleware.js";
+import * as authService from "@/services/auth.service.js";
+import { sendResponse } from "@/utils/response.js";
 
 export const sendOtp = asyncHandler(async (req: Request, res: Response) => {
     await authService.sendOtp(req.body);

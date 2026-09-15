@@ -1,8 +1,9 @@
 import type { Request, Response } from "express";
-import { asyncHandler } from "../middlewares/async-handler.middleware.js";
-import * as eventService from "../services/event.service.js";
-import { sendResponse } from "../utils/response.js";
-import { eventQuerySchema } from "../validations/event.validation.js";
+
+import { asyncHandler } from "@/middlewares/async-handler.middleware.js";
+import * as eventService from "@/services/event.service.js";
+import { sendResponse } from "@/utils/response.js";
+import { eventQuerySchema } from "@/validations/event.validation.js";
 
 export const getAllEvents = asyncHandler(async (req: Request, res: Response) => {
     const query = eventQuerySchema.parse(req.query);

@@ -1,6 +1,6 @@
-import { db } from "../db/index.js";
-import type { Rsvp, RsvpListItem } from "../types/rsvp.js";
-import type { CreateRsvpInput, RsvpQuery } from "../validations/rsvp.validation.js";
+import { db } from "@/db/index.js";
+import type { Rsvp, RsvpListItem } from "@/types/rsvp.js";
+import type { CreateRsvpInput, RsvpQuery } from "@/validations/rsvp.validation.js";
 
 export async function findAll(
     query: RsvpQuery,

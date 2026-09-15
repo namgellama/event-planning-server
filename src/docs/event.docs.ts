@@ -1,4 +1,4 @@
-import { registry } from "../config/swagger.js";
+import { registry } from "@/config/swagger.js";
 import {
     createEventSchema,
     eventItemSchema,
@@ -6,12 +6,12 @@ import {
     eventWithTagIdsSchema,
     paginatedEventsSchema,
     updateEventSchema,
-} from "../validations/event.validation.js";
+} from "@/validations/event.validation.js";
 import {
     errorResponseSchema,
     idParamRequestSchema,
     successResponseSchema,
-} from "../validations/request-response.validation.js";
+} from "@/validations/request-response.validation.js";
 
 // Fetch all events
 registry.registerPath({

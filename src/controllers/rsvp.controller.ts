@@ -1,8 +1,9 @@
 import type { Request, Response } from "express";
-import { asyncHandler } from "../middlewares/async-handler.middleware.js";
-import * as rsvpService from "../services/rsvp.service.js";
-import { sendResponse } from "../utils/response.js";
-import { rsvpQuerySchema } from "../validations/rsvp.validation.js";
+
+import { asyncHandler } from "@/middlewares/async-handler.middleware.js";
+import * as rsvpService from "@/services/rsvp.service.js";
+import { sendResponse } from "@/utils/response.js";
+import { rsvpQuerySchema } from "@/validations/rsvp.validation.js";
 
 export const fetchAllRsvps = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
     const query = rsvpQuerySchema.parse(req.query);

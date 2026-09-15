@@ -1,8 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
-import { env } from "../config/env.js";
-import { AppError } from "../errors/app-error.js";
-import * as userRepository from "../repositories/user.repository.js";
-import { verifyToken } from "../utils/jwt.js";
+
+import { env } from "@/config/env.js";
+import { AppError } from "@/errors/app-error.js";
+import * as userRepository from "@/repositories/user.repository.js";
+import { verifyToken } from "@/utils/jwt.js";
 
 export async function protect(req: Request, _res: Response, next: NextFunction) {
     try {

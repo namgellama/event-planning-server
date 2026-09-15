@@ -2,14 +2,15 @@ import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 import ms from "ms";
 import QRCode from "qrcode";
-import { env } from "../config/env.js";
-import { redis } from "../config/redis.js";
-import { AppError } from "../errors/app-error.js";
-import * as userRepository from "../repositories/user.repository.js";
-import type { User } from "../types/user.js";
-import { generate2FAToken, signToken, verify2FAToken, verifyToken } from "../utils/jwt.js";
-import { generateOtp, hashOtp } from "../utils/otp.js";
-import { createTotpSecret, createTotpUri, verifyTotp } from "../utils/totp.js";
+
+import { env } from "@/config/env.js";
+import { redis } from "@/config/redis.js";
+import { AppError } from "@/errors/app-error.js";
+import * as userRepository from "@/repositories/user.repository.js";
+import type { User } from "@/types/user.js";
+import { generate2FAToken, signToken, verify2FAToken, verifyToken } from "@/utils/jwt.js";
+import { generateOtp, hashOtp } from "@/utils/otp.js";
+import { createTotpSecret, createTotpUri, verifyTotp } from "@/utils/totp.js";
 import type {
     Disable2FAInput,
     LoginUserInput,
@@ -18,7 +19,7 @@ import type {
     Verify2FAInput,
     Verify2FASetupInput,
     VerifyEmailInput,
-} from "../validations/auth.validation.js";
+} from "@/validations/auth.validation.js";
 import * as emailService from "./email.service.js";
 
 const registerOtpKey = (email: string) => `register-otp:${email}`;

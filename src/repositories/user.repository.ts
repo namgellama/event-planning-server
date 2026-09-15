@@ -1,6 +1,6 @@
-import { db } from "../db/index.js";
-import type { User } from "../types/user.js";
-import type { RegisterUserInput } from "../validations/auth.validation.js";
+import { db } from "@/db/index.js";
+import type { User } from "@/types/user.js";
+import type { RegisterUserInput } from "@/validations/auth.validation.js";
 
 export async function findById(id: string): Promise<User | undefined> {
     return await db<User>("users").select("*").where("id", id).first();

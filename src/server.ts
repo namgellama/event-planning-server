@@ -1,7 +1,7 @@
-import app from "./app.js";
-import { env } from "./config/env.js";
-import { logger } from "./config/logger.js";
-import { checkDB } from "./db/index.js";
+import app from "@/app.js";
+import { env } from "@/config/env.js";
+import { logger } from "@/config/logger.js";
+import { checkDB } from "@/db/index.js";
 
 const PORT = env.PORT;
 const ENVIRONMENT = env.NODE_ENV;

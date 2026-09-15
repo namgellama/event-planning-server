@@ -1,5 +1,6 @@
 import z from "zod";
-import { registry } from "../config/swagger.js";
+
+import { registry } from "@/config/swagger.js";
 import {
     disable2FASchema,
     loginResponseSchema,
@@ -9,13 +10,13 @@ import {
     sendOtpSchema,
     verify2FASchema,
     verifyEmailSchema,
-} from "../validations/auth.validation.js";
+} from "@/validations/auth.validation.js";
 import {
     errorResponseSchema,
     nullDataSchema,
     successResponseSchema,
-} from "../validations/request-response.validation.js";
-import { userResponseSchema } from "../validations/user.validation.js";
+} from "@/validations/request-response.validation.js";
+import { userResponseSchema } from "@/validations/user.validation.js";
 
 // Send OTP
 registry.registerPath({

@@ -1,5 +1,6 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
-import "../docs/index.js";
+
+import "@/docs/index.js";
 
 export const registry = new OpenAPIRegistry();
 

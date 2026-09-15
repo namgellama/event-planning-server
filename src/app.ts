@@ -3,14 +3,15 @@ import cors from "cors";
 import express, { type Request, type Response } from "express";
 import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
-import { env } from "./config/env.js";
-import { swaggerSpec } from "./docs/index.js";
-import { errorHandler } from "./errors/error-handler.js";
-import { notFound } from "./errors/not-found.js";
-import authRoutes from "./routes/auth.route.js";
-import eventRoutes from "./routes/event.route.js";
-import rsvpRoutes from "./routes/rsvp.route.js";
-import tagRoutes from "./routes/tag.route.js";
+
+import { env } from "@/config/env.js";
+import { swaggerSpec } from "@/docs/index.js";
+import { errorHandler } from "@/errors/error-handler.js";
+import { notFound } from "@/errors/not-found.js";
+import authRoutes from "@/routes/auth.route.js";
+import eventRoutes from "@/routes/event.route.js";
+import rsvpRoutes from "@/routes/rsvp.route.js";
+import tagRoutes from "@/routes/tag.route.js";
 
 const app = express();
 

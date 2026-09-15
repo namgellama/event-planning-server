@@ -1,12 +1,13 @@
 import type { Knex } from "knex";
-import { db } from "../db/index.js";
-import type { EventTag } from "../types/event-tag.js";
-import type { Event, EventItem, EventListItem, EventWithTagIds } from "../types/event.js";
+
+import { db } from "@/db/index.js";
+import type { EventTag } from "@/types/event-tag.js";
+import type { Event, EventItem, EventListItem, EventWithTagIds } from "@/types/event.js";
 import type {
     CreateEventInput,
     EventQuery,
     UpdateEventInput,
-} from "../validations/event.validation.js";
+} from "@/validations/event.validation.js";
 
 export async function findAll(
     query: EventQuery,

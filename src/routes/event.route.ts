@@ -1,8 +1,9 @@
 import { Router } from "express";
-import * as eventController from "../controllers/event.controller.js";
-import { admin, protect } from "../middlewares/auth.middleware.js";
-import { validateBody } from "../middlewares/validate-body.middleware.js";
-import { createEventSchema, updateEventSchema } from "../validations/event.validation.js";
+
+import * as eventController from "@/controllers/event.controller.js";
+import { admin, protect } from "@/middlewares/auth.middleware.js";
+import { validateBody } from "@/middlewares/validate-body.middleware.js";
+import { createEventSchema, updateEventSchema } from "@/validations/event.validation.js";
 
 const router = Router();
 

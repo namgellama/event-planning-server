@@ -1,7 +1,8 @@
 import { Router } from "express";
-import * as authController from "../controllers/auth.controller.js";
-import { protect } from "../middlewares/auth.middleware.js";
-import { validateBody } from "../middlewares/validate-body.middleware.js";
+
+import * as authController from "@/controllers/auth.controller.js";
+import { protect } from "@/middlewares/auth.middleware.js";
+import { validateBody } from "@/middlewares/validate-body.middleware.js";
 import {
     disable2FASchema,
     loginUserSchema,
@@ -10,7 +11,7 @@ import {
     verify2FASchema,
     verify2FASetupSchema,
     verifyEmailSchema,
-} from "../validations/auth.validation.js";
+} from "@/validations/auth.validation.js";
 
 const router = Router();
 

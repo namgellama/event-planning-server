@@ -1,16 +1,16 @@
-import { registry } from "../config/swagger.js";
+import { registry } from "@/config/swagger.js";
 import {
     errorResponseSchema,
     idParamRequestSchema,
     successResponseSchema,
-} from "../validations/request-response.validation.js";
+} from "@/validations/request-response.validation.js";
 import {
     createRsvpSchema,
     paginatedRsvpsSchema,
     rsvpQuerySchema,
     rsvpSchema,
     updateRsvpSchema,
-} from "../validations/rsvp.validation.js";
+} from "@/validations/rsvp.validation.js";
 
 // Get all rsvps of an event
 registry.registerPath({

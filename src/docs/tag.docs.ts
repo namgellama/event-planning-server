@@ -1,16 +1,16 @@
-import { registry } from "../config/swagger.js";
+import { registry } from "@/config/swagger.js";
 import {
     errorResponseSchema,
     idParamRequestSchema,
     successResponseSchema,
-} from "../validations/request-response.validation.js";
+} from "@/validations/request-response.validation.js";
 import {
     createTagSchema,
     paginatedTagsSchema,
     tagQuerySchema,
     tagSchema,
     updateTagSchema,
-} from "../validations/tag.validation.js";
+} from "@/validations/tag.validation.js";
 
 // Fetch all tags
 registry.registerPath({

@@ -1,8 +1,9 @@
 import { Router } from "express";
-import * as tagController from "../controllers/tag.controller.js";
-import { admin, protect } from "../middlewares/auth.middleware.js";
-import { validateBody } from "../middlewares/validate-body.middleware.js";
-import { createTagSchema, updateTagSchema } from "../validations/tag.validation.js";
+
+import * as tagController from "@/controllers/tag.controller.js";
+import { admin, protect } from "@/middlewares/auth.middleware.js";
+import { validateBody } from "@/middlewares/validate-body.middleware.js";
+import { createTagSchema, updateTagSchema } from "@/validations/tag.validation.js";
 
 const router = Router();
 
