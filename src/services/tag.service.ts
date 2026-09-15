@@ -38,8 +38,8 @@ export async function createTag(body: CreateTagInput, userId: string): Promise<T
     return tagRepository.create(body, userId);
 }
 
-export async function updateTag(tagId: string, body: CreateTagInput, userId: string): Promise<Tag> {
-    const tag = await tagRepository.update(tagId, body, userId);
+export async function updateTag(tagId: string, body: CreateTagInput): Promise<Tag> {
+    const tag = await tagRepository.update(tagId, body);
 
     if (!tag) {
         throw new AppError(404, "Tag not found");
@@ -47,8 +47,8 @@ export async function updateTag(tagId: string, body: CreateTagInput, userId: str
     return tag;
 }
 
-export async function deleteTag(tagId: string, userId: string): Promise<void> {
-    const tag = await tagRepository.remove(tagId, userId);
+export async function deleteTag(tagId: string): Promise<void> {
+    const tag = await tagRepository.remove(tagId);
 
     if (tag === 0) {
         throw new AppError(404, "Tag not found");

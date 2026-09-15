@@ -50,23 +50,19 @@ export async function create(body: CreateTagInput, userId: string): Promise<Tag>
     return tag!;
 }
 
-export async function update(
-    tagId: string,
-    body: UpdateTagInput,
-    userId: string,
-): Promise<Tag | undefined> {
+export async function update(tagId: string, body: UpdateTagInput): Promise<Tag | undefined> {
     const updateData = Object.fromEntries(
         Object.entries(body).filter(([, value]) => value != undefined),
     );
 
     const [tag] = await db<Tag>("tags")
-        .where({ id: tagId, userId })
+        .where({ id: tagId })
         .update({ ...updateData, updatedAt: new Date() })
         .returning("*");
 
     return tag;
 }
 
-export async function remove(tagId: string, userId: string): Promise<number> {
-    return await db<Tag>("tags").where({ id: tagId, userId }).delete();
+export async function remove(tagId: string): Promise<number> {
+    return await db<Tag>("tags").where({ id: tagId }).delete();
 }

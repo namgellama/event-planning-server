@@ -46,7 +46,7 @@ export const createTag = asyncHandler(async (req: Request, res: Response) => {
  * @access Private/Admin
  */
 export const updateTag = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    const tag = await tagService.updateTag(req.params.id, req.body, req.user.id);
+    const tag = await tagService.updateTag(req.params.id, req.body);
 
     sendResponse(res, tag, "Tag updated successfully");
 });
@@ -57,7 +57,7 @@ export const updateTag = asyncHandler(async (req: Request<{ id: string }>, res: 
  * @access Private/Admin
  */
 export const deleteTag = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    await tagService.deleteTag(req.params.id, req.user.id);
+    await tagService.deleteTag(req.params.id);
 
     res.status(204).end();
 });

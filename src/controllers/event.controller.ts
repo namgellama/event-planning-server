@@ -46,7 +46,7 @@ export const createEvent = asyncHandler(async (req: Request, res: Response) => {
  * @access Private/Admin
  */
 export const updateEvent = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    const event = await eventService.updateEvent(req.params.id, req.body, req.user.id);
+    const event = await eventService.updateEvent(req.params.id, req.body);
 
     sendResponse(res, event, "Event updated successfully");
 });
@@ -57,7 +57,7 @@ export const updateEvent = asyncHandler(async (req: Request<{ id: string }>, res
  * @access Private/Admin
  */
 export const deleteEvent = asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
-    await eventService.deleteEvent(req.params.id, req.user.id);
+    await eventService.deleteEvent(req.params.id);
 
     res.status(204).end();
 });

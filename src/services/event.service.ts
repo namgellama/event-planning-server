@@ -72,9 +72,8 @@ export async function createEvent(
 export async function updateEvent(
     eventId: string,
     body: UpdateEventInput,
-    userId: string,
 ): Promise<EventWithTagIds> {
-    const event = await eventRespository.update(eventId, body, userId);
+    const event = await eventRespository.update(eventId, body);
 
     if (!event) {
         throw new AppError(404, "Event not found");
@@ -83,8 +82,8 @@ export async function updateEvent(
     return event;
 }
 
-export async function deleteEvent(eventId: string, userId: string): Promise<void> {
-    const deleted = await eventRespository.remove(eventId, userId);
+export async function deleteEvent(eventId: string): Promise<void> {
+    const deleted = await eventRespository.remove(eventId);
 
     if (deleted === 0) {
         throw new AppError(404, "Event not found");
