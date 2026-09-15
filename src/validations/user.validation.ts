@@ -1,5 +1,6 @@
 import { z } from "zod";
-import "../config/zod-extend.js";
+
+import "@/config/zod-extend.js";
 
 export const userResponseSchema = z
     .object({

@@ -1,6 +1,6 @@
-import { db } from "../db/index.js";
-import type { Tag } from "../types/tag.js";
-import type { CreateTagInput, TagQuery, UpdateTagInput } from "../validations/tag.validation.js";
+import { db } from "@/db/index.js";
+import type { Tag } from "@/types/tag.js";
+import type { CreateTagInput, TagQuery, UpdateTagInput } from "@/validations/tag.validation.js";
 
 export async function findAll(query: TagQuery): Promise<{ tags: Tag[]; total: number }> {
     const { page, limit, search, sortBy, sortOrder } = query;
@@ -38,8 +38,8 @@ export async function findById(tagId: string): Promise<Tag | undefined> {
     return await db<Tag>("tags").select("*").where("id", tagId).first();
 }
 
-export async function findByIds(tagId: string[]): Promise<Tag[]> {
-    return await db<Tag>("tags").select("*").whereIn("id", tagId);
+export async function findByIds(tagIds: string[]): Promise<Tag[]> {
+    return await db<Tag>("tags").select("*").whereIn("id", tagIds);
 }
 
 export async function create(body: CreateTagInput, userId: string): Promise<Tag> {
@@ -50,23 +50,19 @@ export async function create(body: CreateTagInput, userId: string): Promise<Tag>
     return tag!;
 }
 
-export async function update(
-    tagId: string,
-    body: UpdateTagInput,
-    userId: string,
-): Promise<Tag | undefined> {
+export async function update(tagId: string, body: UpdateTagInput): Promise<Tag | undefined> {
     const updateData = Object.fromEntries(
         Object.entries(body).filter(([, value]) => value != undefined),
     );
 
     const [tag] = await db<Tag>("tags")
-        .where({ id: tagId, userId })
+        .where({ id: tagId })
         .update({ ...updateData, updatedAt: new Date() })
         .returning("*");
 
     return tag;
 }
 
-export async function remove(tagId: string, userId: string): Promise<number> {
-    return await db<Tag>("tags").where({ id: tagId, userId }).delete();
+export async function remove(tagId: string): Promise<number> {
+    return await db<Tag>("tags").where({ id: tagId }).delete();
 }

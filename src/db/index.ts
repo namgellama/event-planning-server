@@ -1,8 +1,9 @@
 import knex from "knex";
 import knexStringcase from "knex-stringcase";
 import { Pool } from "pg";
-import { env } from "../config/env.js";
-import { logger } from "../config/logger.js";
+
+import { env } from "@/config/env.js";
+import { logger } from "@/config/logger.js";
 
 const pool = new Pool({
     database: env.POSTGRES_DB,

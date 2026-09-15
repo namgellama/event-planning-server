@@ -1,5 +1,6 @@
 import z from "zod";
-import "../config/zod-extend.js";
+
+import "@/config/zod-extend.js";
 
 export const sendOtpSchema = z
     .object({
@@ -113,3 +114,24 @@ export const disable2FASchema = z
     .openapi("Disable2FAInput");
 
 export type Disable2FAInput = z.infer<typeof disable2FASchema>;
+
+export const setup2FAResponseSchema = z.object({
+    qrCode: z.string().openapi({
+        example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+        description: "Base64-encoded QR code containing the TOTP setup URI.",
+    }),
+});
+
+export const verify2FAResponseSchema = z.object({
+    requiresTwoFactor: z.boolean().openapi({
+        example: false,
+    }),
+    accessToken: z.string().openapi({
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        description: "JWT access token used to authenticate API requests.",
+    }),
+    refreshToken: z.string().openapi({
+        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        description: "JWT refresh token used to obtain a new access token.",
+    }),
+});

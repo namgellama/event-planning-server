@@ -1,7 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
+
+import { logger } from "@/config/logger.js";
 import { AppError } from "./app-error.js";
-import { logger } from "../config/logger.js";
 
 export async function errorHandler(
     error: unknown,

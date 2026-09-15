@@ -1,11 +1,11 @@
-import { db } from "../db/index.js";
-import type { Rsvp, RsvpListItem } from "../types/rsvp.js";
-import type { CreateRsvpInput, RsvpQuery } from "../validations/rsvp.validation.js";
+import { db } from "@/db/index.js";
+import type { RSVP, RSVPListItem } from "@/types/rsvp.js";
+import type { CreateRSVPInput, RSVPQuery } from "@/validations/rsvp.validation.js";
 
 export async function findAll(
-    query: RsvpQuery,
+    query: RSVPQuery,
     eventId: string,
-): Promise<{ rsvps: RsvpListItem[]; total: number }> {
+): Promise<{ rsvps: RSVPListItem[]; total: number }> {
     const { page, limit, status, sortBy, sortOrder, search } = query;
 
     const offset = (page - 1) * limit;
@@ -15,7 +15,7 @@ export async function findAll(
         updatedAt: "rsvps.updatedAt",
     }[sortBy];
 
-    const baseQuery = db<Rsvp>("rsvps")
+    const baseQuery = db<RSVP>("rsvps")
         .join("users", "users.id", "rsvps.user_id")
         .where("rsvps.event_id", eventId)
         .modify((query) => {
@@ -63,8 +63,8 @@ export async function findAll(
 export async function findByEventAndUser(
     eventId: string,
     userId: string,
-): Promise<Rsvp | undefined> {
-    return await db<Rsvp>("rsvps")
+): Promise<RSVP | undefined> {
+    return await db<RSVP>("rsvps")
         .select("*")
         .where("eventId", eventId)
         .where("userId", userId)
@@ -72,11 +72,11 @@ export async function findByEventAndUser(
 }
 
 export async function create(
-    body: CreateRsvpInput,
+    body: CreateRSVPInput,
     eventId: string,
     userId: string,
-): Promise<Rsvp> {
-    const [rsvp] = await db<Rsvp>("rsvps")
+): Promise<RSVP> {
+    const [rsvp] = await db<RSVP>("rsvps")
         .insert({ ...body, eventId, userId })
         .returning("*");
 
@@ -84,11 +84,11 @@ export async function create(
 }
 
 export async function update(
-    body: CreateRsvpInput,
+    body: CreateRSVPInput,
     eventId: string,
     userId: string,
-): Promise<Rsvp | undefined> {
-    const [rsvp] = await db<Rsvp>("rsvps")
+): Promise<RSVP | undefined> {
+    const [rsvp] = await db<RSVP>("rsvps")
         .where({ eventId, userId })
         .update({
             ...body,

@@ -1,12 +1,13 @@
 import type { Knex } from "knex";
-import { db } from "../db/index.js";
-import type { EventTag } from "../types/event-tag.js";
-import type { Event, EventItem, EventListItem, EventWithTagIds } from "../types/event.js";
+
+import { db } from "@/db/index.js";
+import type { EventTag } from "@/types/event-tag.js";
+import type { Event, EventItem, EventListItem, EventWithTagIds } from "@/types/event.js";
 import type {
     CreateEventInput,
     EventQuery,
     UpdateEventInput,
-} from "../validations/event.validation.js";
+} from "@/validations/event.validation.js";
 
 export async function findAll(
     query: EventQuery,
@@ -76,8 +77,8 @@ export async function findAll(
 
                 db.raw(`
                     COALESCE(
-                        JSON_AGG(
-                            JSON_BUILD_OBJECT(
+                        JSONB_AGG(
+                            DISTINCT JSONB_BUILD_OBJECT(
                                 'id', tags.id,
                                 'title', tags.title
                             )
@@ -135,14 +136,14 @@ export async function findById(eventId: string): Promise<Event | undefined> {
     return db<Event>("events").select("*").where("id", eventId).first();
 }
 
-export async function findByIdWithTags(eventId: string): Promise<EventItem | undefined> {
+export async function findByIdWithDetails(eventId: string): Promise<EventItem | undefined> {
     return db<Event>("events")
         .select(
             "events.*",
             db.raw(`
                 COALESCE(
-                    JSON_AGG(
-                        JSON_BUILD_OBJECT(
+                    JSONB_AGG(
+                        DISTINCT JSONB_BUILD_OBJECT(
                             'id', tags.id,
                             'title', tags.title
                         )
@@ -201,7 +202,6 @@ export async function create(
 export async function update(
     eventId: string,
     body: UpdateEventInput,
-    userId: string,
 ): Promise<EventWithTagIds | undefined> {
     return db.transaction(async (tx: Knex.Transaction) => {
         const { tags, ...eventData } = body;
@@ -213,7 +213,6 @@ export async function update(
         const [event] = await tx<Event>("events")
             .where({
                 id: eventId,
-                userId,
             })
             .update({
                 ...updateData,
@@ -252,7 +251,6 @@ export async function update(
             .leftJoin("event_tags", "events.id", "event_tags.event_id")
             .where({
                 "events.id": eventId,
-                "events.userId": userId,
             })
             .groupBy("events.id")
             .first();
@@ -261,6 +259,6 @@ export async function update(
     });
 }
 
-export async function remove(eventId: string, userId: string): Promise<number> {
-    return db<Event>("events").where({ id: eventId, userId }).delete();
+export async function remove(eventId: string): Promise<number> {
+    return db<Event>("events").where({ id: eventId }).delete();
 }

@@ -1,22 +1,27 @@
-import { registry } from "../config/swagger.js";
+import { registry } from "@/config/swagger.js";
 import {
+    adminErrorResponseSchema,
+    authErrorResponseSchema,
     errorResponseSchema,
     idParamRequestSchema,
+    internalServerErrorResponseSchema,
+    invalidQueryErrorResponseSchema,
     successResponseSchema,
-} from "../validations/request-response.validation.js";
+    validationErrorResponseSchema,
+} from "@/validations/request-response.validation.js";
 import {
-    createRsvpSchema,
-    paginatedRsvpsSchema,
+    createRSVPSchema,
+    paginatedRSVPSchema,
     rsvpQuerySchema,
     rsvpSchema,
-    updateRsvpSchema,
-} from "../validations/rsvp.validation.js";
+    updateRSVPSchema,
+} from "@/validations/rsvp.validation.js";
 
 // Get all rsvps of an event
 registry.registerPath({
     method: "get",
     path: "/events/{id}/rsvps",
-    tags: ["RSVP"],
+    tags: ["RSVPs"],
     summary: "Get event RSVPs",
     description:
         "Returns a paginated list of RSVPs for a specific event. Supports filtering by RSVP status, searching by user name or email, and sorting by creation or update time.",
@@ -36,7 +41,7 @@ registry.registerPath({
                 "application/json": {
                     schema: successResponseSchema(
                         "All rsvps fetched successfully",
-                        paginatedRsvpsSchema,
+                        paginatedRSVPSchema,
                     ),
                 },
             },
@@ -46,25 +51,25 @@ registry.registerPath({
             description: "Invalid query parameters",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Invalid query parameters"),
+                    schema: invalidQueryErrorResponseSchema,
                 },
             },
         },
 
         401: {
-            description: "Unauthenticated",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Not authenticated"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
 
         403: {
-            description: "Forbidden - admin access required",
+            description: "Not authorized - need admin access",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Forbiden - admin access required"),
+                    schema: adminErrorResponseSchema,
                 },
             },
         },
@@ -82,7 +87,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -114,10 +119,10 @@ registry.registerPath({
             },
         },
         401: {
-            description: "Unauthorized",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
@@ -125,7 +130,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -146,17 +151,17 @@ registry.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: createRsvpSchema,
+                    schema: createRSVPSchema,
                 },
             },
         },
     },
     responses: {
         201: {
-            description: "Rsvp created successfully",
+            description: "RSVP created successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema("Rsvp created successfully", rsvpSchema),
+                    schema: successResponseSchema("RSVP created successfully", rsvpSchema),
                 },
             },
         },
@@ -164,15 +169,15 @@ registry.registerPath({
             description: "Validation error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Invalid request body"),
+                    schema: validationErrorResponseSchema,
                 },
             },
         },
         401: {
-            description: "Unauthorized",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
@@ -196,7 +201,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },
@@ -216,17 +221,17 @@ registry.registerPath({
         body: {
             content: {
                 "application/json": {
-                    schema: updateRsvpSchema,
+                    schema: updateRSVPSchema,
                 },
             },
         },
     },
     responses: {
         200: {
-            description: "Rsvp updated successfully",
+            description: "RSVP updated successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema("Rsvp updated successfully", rsvpSchema),
+                    schema: successResponseSchema("RSVP updated successfully", rsvpSchema),
                 },
             },
         },
@@ -234,23 +239,23 @@ registry.registerPath({
             description: "Validation error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Invalid request body"),
+                    schema: validationErrorResponseSchema,
                 },
             },
         },
         401: {
-            description: "Unauthorized",
+            description: "Not authenticated - no token found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Unauthorized"),
+                    schema: authErrorResponseSchema,
                 },
             },
         },
         404: {
-            description: "Rsvp not found",
+            description: "RSVP not found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Rsvp not found"),
+                    schema: errorResponseSchema("RSVP not found"),
                 },
             },
         },
@@ -258,7 +263,7 @@ registry.registerPath({
             description: "Internal server error",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Internal server error"),
+                    schema: internalServerErrorResponseSchema,
                 },
             },
         },

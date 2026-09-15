@@ -1,5 +1,6 @@
 import z from "zod";
-import "../config/zod-extend.js";
+
+import "@/config/zod-extend.js";
 import { paginationSchema, sortOrderSchema } from "./query.validation.js";
 import { paginatedResponseSchema } from "./request-response.validation.js";
 import { tagItemSchema } from "./tag.validation.js";

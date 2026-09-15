@@ -1,16 +1,16 @@
-import { AppError } from "../errors/app-error.js";
-import * as eventRespository from "../repositories/event.repository.js";
-import type { Event, EventItem, EventListItem, EventWithTagIds } from "../types/event.js";
-import type { PaginatedResponse } from "../types/pagination.js";
-import type { User } from "../types/user.js";
+import { AppError } from "@/errors/app-error.js";
+import * as eventRespository from "@/repositories/event.repository.js";
+import type { Event, EventItem, EventListItem, EventWithTagIds } from "@/types/event.js";
+import type { PaginatedResponse } from "@/types/pagination.js";
+import type { User } from "@/types/user.js";
 import type {
     CreateEventInput,
     EventQuery,
     UpdateEventInput,
-} from "../validations/event.validation.js";
+} from "@/validations/event.validation.js";
 import * as tagService from "./tag.service.js";
 
-export async function getAll(
+export async function getAllEvents(
     query: EventQuery,
     user: Pick<User, "id" | "role">,
 ): Promise<PaginatedResponse<EventListItem>> {
@@ -32,8 +32,8 @@ export async function getAll(
     };
 }
 
-export async function getById(eventId: string): Promise<EventItem> {
-    const event = await eventRespository.findByIdWithTags(eventId);
+export async function getEventDetailsById(eventId: string): Promise<EventItem> {
+    const event = await eventRespository.findByIdWithDetails(eventId);
 
     if (!event) {
         throw new AppError(404, "Event not found");
@@ -42,7 +42,7 @@ export async function getById(eventId: string): Promise<EventItem> {
     return event;
 }
 
-export async function findById(eventId: string): Promise<Omit<Event, "tags">> {
+export async function getEventById(eventId: string): Promise<Omit<Event, "tags">> {
     const event = await eventRespository.findById(eventId);
 
     if (!event) {
@@ -52,11 +52,14 @@ export async function findById(eventId: string): Promise<Omit<Event, "tags">> {
     return event;
 }
 
-export async function create(body: CreateEventInput, userId: string): Promise<EventWithTagIds> {
+export async function createEvent(
+    body: CreateEventInput,
+    userId: string,
+): Promise<EventWithTagIds> {
     const { tags = [], ...eventData } = body;
 
     if (tags.length > 0) {
-        const existingTags = await tagService.getByIds(tags);
+        const existingTags = await tagService.getTagsByIds(tags);
 
         if (existingTags.length !== tags.length) {
             throw new AppError(404, "One or more tags not found");
@@ -66,12 +69,11 @@ export async function create(body: CreateEventInput, userId: string): Promise<Ev
     return eventRespository.create(eventData, tags, userId);
 }
 
-export async function update(
+export async function updateEvent(
     eventId: string,
     body: UpdateEventInput,
-    userId: string,
 ): Promise<EventWithTagIds> {
-    const event = await eventRespository.update(eventId, body, userId);
+    const event = await eventRespository.update(eventId, body);
 
     if (!event) {
         throw new AppError(404, "Event not found");
@@ -80,8 +82,8 @@ export async function update(
     return event;
 }
 
-export async function remove(eventId: string, userId: string): Promise<void> {
-    const deleted = await eventRespository.remove(eventId, userId);
+export async function deleteEvent(eventId: string): Promise<void> {
+    const deleted = await eventRespository.remove(eventId);
 
     if (deleted === 0) {
         throw new AppError(404, "Event not found");

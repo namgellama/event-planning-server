@@ -1,13 +1,14 @@
 import { Router } from "express";
-import * as tagController from "../controllers/tag.controller.js";
-import { admin, protect } from "../middlewares/auth.middleware.js";
-import { validateBody } from "../middlewares/validate-body.middleware.js";
-import { createTagSchema, updateTagSchema } from "../validations/tag.validation.js";
+
+import * as tagController from "@/controllers/tag.controller.js";
+import { admin, protect } from "@/middlewares/auth.middleware.js";
+import { validateBody } from "@/middlewares/validate-body.middleware.js";
+import { createTagSchema, updateTagSchema } from "@/validations/tag.validation.js";
 
 const router = Router();
 
 router.get("/", protect, tagController.getAllTags);
-router.get("/:id", protect, tagController.getTag);
+router.get("/:id", protect, tagController.getTagDetails);
 router.post("/", protect, admin, validateBody(createTagSchema), tagController.createTag);
 router.patch("/:id", protect, admin, validateBody(updateTagSchema), tagController.updateTag);
 router.delete("/:id", protect, admin, tagController.deleteTag);

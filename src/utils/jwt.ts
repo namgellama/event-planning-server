@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 import type ms from "ms";
-import { env } from "../config/env.js";
-import { AppError } from "../errors/app-error.js";
-import type { UserRole } from "../types/user.js";
+
+import { env } from "@/config/env.js";
+import { AppError } from "@/errors/app-error.js";
+import type { UserRole } from "@/types/user.js";
 
 export function signToken(
     payload: { sub: string; role: UserRole; type: "access" | "refresh" },

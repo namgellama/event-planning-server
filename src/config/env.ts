@@ -5,29 +5,38 @@ import { z } from "zod";
 dotenv.config();
 
 const envSchema = z.object({
+    // APP
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     PORT: z.coerce.number().int().positive().default(8000),
     LOG_LEVEL: z
         .enum(["info", "error", "warn", "trace", "silent", "debug", "fatal"])
         .default("info"),
     FRONTEND_URL: z.string(),
+
+    // DB
     DATABASE_URL: z.string(),
     POSTGRES_USER: z.string(),
     POSTGRES_PASSWORD: z.string(),
     POSTGRES_DB: z.string(),
     POSTGRES_HOST: z.string(),
     POSTGRES_PORT: z.coerce.number().int(),
+
+    // JWT
     JWT_ACCESS_SECRET: z.string(),
     JWT_ACCESS_EXPIRY: z.custom<ms.StringValue>(),
     JWT_REFRESH_SECRET: z.string(),
     JWT_REFRESH_EXPIRY: z.custom<ms.StringValue>(),
     JWT_2FA_SECRET: z.string(),
     JWT_2FA_EXPIRY: z.custom<ms.StringValue>(),
+
+    // SMTP
     SMTP_HOST: z.string(),
     SMTP_PORT: z.coerce.number().int().positive().default(587),
     SMTP_USER: z.string(),
     SMTP_PASSWORD: z.string(),
     SMTP_FROM: z.string(),
+
+    // REDIS
     REDIS_URL: z.string(),
 });
 

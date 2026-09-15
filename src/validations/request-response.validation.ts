@@ -1,4 +1,5 @@
 import z from "zod";
+import { paginationSchema } from "./query.validation.js";
 
 export const successResponseSchema = <T extends z.ZodType>(message: string, dataSchema: T) =>
     z.object({
@@ -15,12 +16,13 @@ export const errorResponseSchema = (message: string) =>
         message: z.string().openapi({ example: message }),
     });
 
-export const nullDataSchema = z.unknown().nullable().openapi({ example: null });
+export const invalidQueryErrorResponseSchema = errorResponseSchema("Invalid query paramters");
+export const validationErrorResponseSchema = errorResponseSchema("Validation error");
+export const authErrorResponseSchema = errorResponseSchema("Not authenticated - no token found");
+export const adminErrorResponseSchema = errorResponseSchema("Not authorized - need admin access");
+export const internalServerErrorResponseSchema = errorResponseSchema("Internal Server Error");
 
-export const paginationSchema = z.object({
-    page: z.number().default(1).openapi({ example: 1 }),
-    limit: z.number().default(10).openapi({ example: 10 }),
-});
+export const nullDataSchema = z.unknown().nullable().openapi({ example: null });
 
 export const paginatedResponseSchema = <T extends z.ZodType>(itemSchema: T) =>
     z.object({

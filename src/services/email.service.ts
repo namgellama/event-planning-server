@@ -1,5 +1,5 @@
-import { env } from "../config/env.js";
-import { transporter } from "../config/nodemailer.js";
+import { env } from "@/config/env.js";
+import { transporter } from "@/config/nodemailer.js";
 
 export async function sendEmail({
     to,
