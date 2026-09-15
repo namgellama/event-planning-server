@@ -77,8 +77,8 @@ export async function findAll(
 
                 db.raw(`
                     COALESCE(
-                        JSON_AGG(
-                            JSON_BUILD_OBJECT(
+                        JSONB_AGG(
+                            DISTINCT JSONB_BUILD_OBJECT(
                                 'id', tags.id,
                                 'title', tags.title
                             )
@@ -142,8 +142,8 @@ export async function findByIdWithDetails(eventId: string): Promise<EventItem | 
             "events.*",
             db.raw(`
                 COALESCE(
-                    JSON_AGG(
-                        JSON_BUILD_OBJECT(
+                    JSONB_AGG(
+                        DISTINCT JSONB_BUILD_OBJECT(
                             'id', tags.id,
                             'title', tags.title
                         )

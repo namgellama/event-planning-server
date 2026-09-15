@@ -153,10 +153,10 @@ registry.registerPath({
     },
     responses: {
         201: {
-            description: "Rsvp created successfully",
+            description: "RSVP created successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema("Rsvp created successfully", rsvpSchema),
+                    schema: successResponseSchema("RSVP created successfully", rsvpSchema),
                 },
             },
         },
@@ -223,10 +223,10 @@ registry.registerPath({
     },
     responses: {
         200: {
-            description: "Rsvp updated successfully",
+            description: "RSVP updated successfully",
             content: {
                 "application/json": {
-                    schema: successResponseSchema("Rsvp updated successfully", rsvpSchema),
+                    schema: successResponseSchema("RSVP updated successfully", rsvpSchema),
                 },
             },
         },
@@ -247,10 +247,10 @@ registry.registerPath({
             },
         },
         404: {
-            description: "Rsvp not found",
+            description: "RSVP not found",
             content: {
                 "application/json": {
-                    schema: errorResponseSchema("Rsvp not found"),
+                    schema: errorResponseSchema("RSVP not found"),
                 },
             },
         },
