@@ -131,7 +131,7 @@ export async function login(
         env.JWT_ACCESS_SECRET,
         env.JWT_ACCESS_EXPIRY,
     );
-    signToken(
+    const refreshToken = signToken(
         { sub: user.id, role: user.role, type: "refresh" },
         env.JWT_REFRESH_SECRET,
         env.JWT_REFRESH_EXPIRY,
@@ -264,7 +264,7 @@ export async function verify2FA(
         env.JWT_ACCESS_SECRET,
         env.JWT_ACCESS_EXPIRY,
     );
-    signToken(
+    const refreshToken = signToken(
         { sub: user.id, role: user.role, type: "refresh" },
         env.JWT_REFRESH_SECRET,
         env.JWT_REFRESH_EXPIRY,
