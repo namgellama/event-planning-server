@@ -130,8 +130,4 @@ export const verify2FAResponseSchema = z.object({
         example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
         description: "JWT access token used to authenticate API requests.",
     }),
-    refreshToken: z.string().openapi({
-        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-        description: "JWT refresh token used to obtain a new access token.",
-    }),
 });
