@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 import ms from "ms";
 import QRCode from "qrcode";
@@ -10,6 +9,7 @@ import * as userRepository from "@/repositories/user.repository.js";
 import type { User } from "@/types/user.js";
 import { generate2FAToken, signToken, verify2FAToken, verifyToken } from "@/utils/jwt.js";
 import { generateOtp, hashOtp } from "@/utils/otp.js";
+import { comparePassword, hashPassword } from "@/utils/password.js";
 import { createTotpSecret, createTotpUri, verifyTotp } from "@/utils/totp.js";
 import type {
     Disable2FAInput,
@@ -90,7 +90,7 @@ export async function register(body: RegisterUserInput): Promise<Omit<User, "pas
         throw new AppError(409, "Email already exists");
     }
 
-    const hashedPassword = await bcrypt.hash(body.password, 12);
+    const hashedPassword = await hashPassword(body.password);
 
     const newUser = await userRepository.create({ ...body, password: hashedPassword });
 
@@ -103,8 +103,7 @@ export async function login(
     res: Response,
     body: LoginUserInput,
 ): Promise<
-    | { requires2FA: boolean; twoFactorToken: string }
-    | { requires2FA: boolean; accessToken: string; refreshToken: string }
+    { requires2FA: boolean; twoFactorToken: string } | { requires2FA: boolean; accessToken: string }
 > {
     const user = await userRepository.findByEmail(body.email);
 
@@ -112,7 +111,7 @@ export async function login(
         throw new AppError(401, "Invalid credentials");
     }
 
-    const isValid = await bcrypt.compare(body.password, user.password);
+    const isValid = await comparePassword(body.password, user.password);
 
     if (!isValid) {
         throw new AppError(401, "Invalid credentials");
@@ -145,7 +144,7 @@ export async function login(
         maxAge: ms(env.JWT_REFRESH_EXPIRY as ms.StringValue),
     });
 
-    return { requires2FA: false, accessToken, refreshToken };
+    return { requires2FA: false, accessToken };
 }
 
 export async function logout(res: Response): Promise<void> {
@@ -241,7 +240,7 @@ export async function verify2FASetup(body: Verify2FASetupInput, userId: string):
 export async function verify2FA(
     body: Verify2FAInput,
     res: Response,
-): Promise<{ requiresTwoFactor: boolean; accessToken: string; refreshToken: string }> {
+): Promise<{ requiresTwoFactor: boolean; accessToken: string }> {
     const payload = verify2FAToken(body.twoFactorToken);
 
     const user = await userRepository.findById(payload.sub);
@@ -278,7 +277,7 @@ export async function verify2FA(
         maxAge: ms(env.JWT_REFRESH_EXPIRY as ms.StringValue),
     });
 
-    return { requiresTwoFactor: false, accessToken, refreshToken };
+    return { requiresTwoFactor: false, accessToken };
 }
 
 export async function disable2FA(body: Disable2FAInput, userId: string): Promise<void> {
